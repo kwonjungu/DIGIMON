@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1~2차시 · 데이터로 만나는 반려동물 사회</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        body { font-family:'Jua',sans-serif; background-color:#ECFEFF; }
+        .card-hover { transition:transform .3s cubic-bezier(.175,.885,.32,1.275),box-shadow .3s; }
+        .step-btn { transition:all .3s cubic-bezier(.175,.885,.32,1.275); border:1px solid #E5E5E5; }
+        .step-btn:hover { transform:translateY(-4px); }
+        .step-btn.active { transform:scale(1.06); box-shadow:0 8px 25px rgba(0,0,0,.15); }
+        .step-btn.done { opacity:.7; }
+        .step-btn.done .done-check { display:block; }
+        .done-check { display:none; }
+        .panel { display:none; animation:fadeIn .4s ease; }
+        .panel.active { display:block; }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes bounce-slow { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+        .bounce-slow { animation:bounce-slow 2.2s ease-in-out infinite; }
+        #toast { visibility:hidden;min-width:250px;background:linear-gradient(135deg,#0d9488,#14b8a6);color:#fff;text-align:center;border-radius:999px;padding:14px 24px;position:fixed;z-index:50;left:50%;bottom:30px;transform:translateX(-50%);font-size:1.1rem;box-shadow:0 10px 30px rgba(13,148,136,.3);opacity:0;transition:opacity .3s,bottom .3s; }
+        #toast.show { visibility:visible;opacity:1;bottom:50px; }
+        input[type="text"], input[type="number"], textarea, select { background-color:#ffffff !important; }
+        .chip input { display:none; }
+        .chip-box { display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:999px; border:2px solid #99F6E4; background:#F0FDFA; color:#0F766E; font-weight:bold; cursor:pointer; transition:all .2s; }
+        .chip input:checked + .chip-box { background:#14B8A6; border-color:#0D9488; color:#FFFFFF; transform:scale(1.05); box-shadow:0 6px 14px rgba(13,148,136,.25); }
+        .vote-btn { transition:all .2s; }
+        .vote-btn.picked { transform:scale(1.05); box-shadow:0 8px 20px rgba(0,0,0,.15); }
+        @media print { body{background:white!important} .no-print{display:none!important} .shadow-md,.shadow-lg{box-shadow:none!important} .panel{display:block!important} .panel + .panel{page-break-before:always} }
+    </style>
+</head>
+<body class="text-gray-800 pb-20 p-4 md:p-8">
+
+<!-- Nav -->
+<nav class="max-w-4xl mx-auto mb-6 no-print">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+        <a href="../" class="inline-flex items-center gap-2 bg-white px-5 py-2.5 rounded-full shadow-md text-teal-600 font-bold hover:bg-teal-50 transition text-lg">
+            <i class="fa-solid fa-arrow-left"></i> 메인으로
+        </a>
+        <div class="flex gap-2 flex-wrap">
+            <span class="px-4 py-2 rounded-full text-sm font-bold bg-teal-500 text-white shadow-md">1~2차시</span>
+            <a href="../3-4/" class="px-4 py-2 rounded-full text-sm font-bold bg-purple-100 text-purple-700 hover:bg-purple-200 transition">3~4차시</a>
+            <a href="../5-6/" class="px-4 py-2 rounded-full text-sm font-bold bg-orange-100 text-orange-700 hover:bg-orange-200 transition">5~6차시</a>
+            <a href="../7-8/" class="px-4 py-2 rounded-full text-sm font-bold bg-blue-100 text-blue-700 hover:bg-blue-200 transition">7~8차시</a>
+            <a href="../9/" class="px-4 py-2 rounded-full text-sm font-bold bg-pink-100 text-pink-700 hover:bg-pink-200 transition">9차시</a>
+        </div>
+    </div>
+    <div class="flex justify-center gap-3">
+        <button onclick="window.print()" class="inline-flex items-center gap-2 bg-white px-5 py-2.5 rounded-full shadow-md text-purple-600 font-bold hover:bg-purple-50 transition">
+            <i class="fa-solid fa-print"></i> 인쇄하기
+        </button>
+        <button onclick="resetAll()" class="inline-flex items-center gap-2 bg-white px-5 py-2.5 rounded-full shadow-md text-red-500 font-bold hover:bg-red-50 transition">
+            <i class="fa-solid fa-rotate-left"></i> 초기화
+        </button>
+    </div>
+</nav>
+
+<!-- Header -->
+<header class="text-center mb-8">
+    <div class="inline-block bg-white px-6 py-3 rounded-full shadow-md border-4 border-teal-200 mb-3">
+        <p class="text-lg text-teal-600">1~2차시 · 문제 마주보기</p>
+    </div>
+    <h1 class="text-3xl md:text-4xl font-bold text-teal-700 mb-2">
+        <i class="fa-solid fa-paw mr-2 bounce-slow inline-block"></i>데이터로 만나는 반려동물 사회
+    </h1>
+    <p class="text-lg text-gray-500 max-w-2xl mx-auto">
+        다양한 데이터를 활용해 반려동물 현황을 조사하여,<br>우리 사회의 반려동물 문제를 설명해 봐요.
+    </p>
+</header>
+
+<!-- Step Navigation -->
+<div class="max-w-4xl mx-auto mb-10 no-print">
+    <div class="grid grid-cols-3 gap-3">
+        <button onclick="goStep(1)" id="step1btn" class="step-btn active bg-white rounded-2xl p-3 shadow-md border-b-4 border-teal-400 text-center relative">
+            <div class="done-check absolute top-2 right-2 text-green-500"><i class="fa-solid fa-circle-check"></i></div>
+            <div class="text-2xl text-teal-500 mb-1"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
+            <h3 class="text-sm font-bold text-teal-600">활동 1</h3>
+            <p class="text-xs text-gray-500">데이터 조사관</p>
+        </button>
+        <button onclick="goStep(2)" id="step2btn" class="step-btn bg-white rounded-2xl p-3 shadow-md border-b-4 border-rose-400 text-center relative">
+            <div class="done-check absolute top-2 right-2 text-green-500"><i class="fa-solid fa-circle-check"></i></div>
+            <div class="text-2xl text-rose-500 mb-1"><i class="fa-solid fa-heart-crack"></i></div>
+            <h3 class="text-sm font-bold text-rose-600">활동 2</h3>
+            <p class="text-xs text-gray-500">한 발짝 더</p>
+        </button>
+        <button onclick="goStep(3)" id="step3btn" class="step-btn bg-white rounded-2xl p-3 shadow-md border-b-4 border-amber-400 text-center relative">
+            <div class="done-check absolute top-2 right-2 text-green-500"><i class="fa-solid fa-circle-check"></i></div>
+            <div class="text-2xl text-amber-500 mb-1"><i class="fa-solid fa-house-chimney-user"></i></div>
+            <h3 class="text-sm font-bold text-amber-600">활동 3</h3>
+            <p class="text-xs text-gray-500">여러 종류 살펴보기</p>
+        </button>
+    </div>
+</div>
+
+<main class="max-w-4xl mx-auto">
+
+<!-- ===== 활동 1 ===== -->
+<div id="panel1" class="panel active">
+    <section id="share-12-a1" class="bg-white rounded-3xl p-6 md:p-8 shadow-md border-b-8 border-teal-400 mb-6">
+        <h2 class="text-2xl font-bold text-teal-700 mb-2"><i class="fa-solid fa-magnifying-glass-chart mr-2"></i>활동 1. 데이터 조사관이 되었어요</h2>
+        <p class="text-gray-500 mb-6">강아지와 고양이 중 누가 더 인기일까요? 교실에서 먼저 토론한 뒤, 진짜 데이터로 확인해 봐요.</p>
+
+        <!-- (1) 교실 토론 -->
+        <div class="bg-teal-50 rounded-2xl p-4 border-2 border-teal-100 mb-6">
+            <p class="text-teal-800 font-bold mb-2"><i class="fa-solid fa-comments mr-1"></i>① 교실 토론 — 누가 더 인기일까요?</p>
+            <p class="text-gray-700 mb-3">내 생각을 먼저 골라요. 그리고 친구들과 이유를 나눠봐요.</p>
+            <div class="flex flex-wrap gap-3 mb-3 justify-center">
+                <button type="button" id="voteDogBtn" onclick="setVote('dog')" class="vote-btn bg-white border-4 border-amber-300 text-amber-700 font-bold py-4 px-8 rounded-2xl text-xl hover:bg-amber-50">
+                    <i class="fa-solid fa-dog text-3xl block mb-1"></i> 강아지!
+                </button>
+                <button type="button" id="voteCatBtn" onclick="setVote('cat')" class="vote-btn bg-white border-4 border-slate-300 text-slate-700 font-bold py-4 px-8 rounded-2xl text-xl hover:bg-slate-50">
+                    <i class="fa-solid fa-cat text-3xl block mb-1"></i> 고양이!
+                </button>
+            </div>
+            <input type="hidden" data-key="vote" id="voteVal">
+            <label class="block text-sm font-bold text-teal-700 mb-1"><i class="fa-solid fa-pen-to-square mr-1"></i>내가 그렇게 생각한 이유</label>
+            <textarea data-key="vote_reason" rows="2" placeholder="예) 우리 동네에서 산책하는 강아지를 더 많이 봤어요." class="w-full px-3 py-2 rounded-xl border-2 border-teal-200 focus:border-teal-400 outline-none resize-none"></textarea>
+        </div>
+
+        <!-- (2) 구글 트렌드 -->
+        <div class="bg-teal-50 rounded-2xl p-4 border-2 border-teal-100 mb-6">
+            <p class="text-teal-800 font-bold mb-2"><i class="fa-solid fa-chart-line mr-1"></i>② 구글 트렌드로 검색량 비교하기</p>
+            <p class="text-gray-700 mb-3">아래 링크에서 <b>최근 5년 · 대한민국</b>으로 설정해 '강아지'와 '고양이'를 비교해 봐요.</p>
+            <a href="https://trends.google.co.kr/trends/explore?geo=KR&q=%EA%B0%95%EC%95%84%EC%A7%80,%EA%B3%A0%EC%96%91%EC%9D%B4" target="_blank" class="inline-flex items-center gap-2 bg-white border-2 border-teal-400 text-teal-700 font-bold py-2 px-4 rounded-full text-sm hover:bg-teal-100 transition">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> 구글 트렌드 · 강아지 vs 고양이 열기
+            </a>
+
+            <!-- 미리보기 차트 (전처리 데이터) -->
+            <div class="bg-white rounded-2xl p-4 mt-4 border border-teal-100">
+                <p class="text-sm text-teal-700 font-bold mb-2"><i class="fa-solid fa-eye mr-1"></i>미리 살펴보는 데이터 (2021~2026 · 검색 관심도)</p>
+                <canvas id="trendChart" height="160"></canvas>
+                <p class="text-xs text-gray-400 mt-1">출처: Google Trends (2026.05 추출, 가장 큰 값을 100으로 환산)</p>
+            </div>
+
+            <!-- 데이터 다운로드 -->
+            <div class="mt-4 bg-white rounded-2xl p-3 border-2 border-dashed border-teal-200">
+                <p class="text-sm text-teal-700 font-bold mb-2"><i class="fa-solid fa-file-csv mr-1"></i>데이터셋 내려받기</p>
+                <div class="flex flex-wrap gap-2">
+                    <a href="data/google_trends_worldwide_2004-2026.csv" download class="inline-flex items-center gap-1 bg-teal-500 hover:bg-teal-600 text-white text-xs font-bold py-1.5 px-3 rounded-full transition"><i class="fa-solid fa-download"></i> 월별 원본 (2004-2026)</a>
+                    <a href="data/google_trends_yearly_summary_2021-2026.csv" download class="inline-flex items-center gap-1 bg-white border-2 border-teal-400 text-teal-700 text-xs font-bold py-1.5 px-3 rounded-full hover:bg-teal-50 transition"><i class="fa-solid fa-download"></i> 연도별 요약 (학생용)</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- (3) 시기·지역 발견 사실 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
+            <div class="bg-amber-50 rounded-2xl p-4 border border-amber-100">
+                <label class="block text-base font-bold text-amber-700 mb-2"><i class="fa-solid fa-calendar-week mr-1"></i>시기에 따른 발견 사실</label>
+                <textarea data-key="time_finding" rows="3" placeholder="예) 여름방학(7~8월)에 검색이 갑자기 늘어나요." class="w-full px-3 py-2 rounded-xl border-2 border-amber-200 focus:border-amber-400 outline-none resize-none"></textarea>
+            </div>
+            <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200">
+                <label class="block text-base font-bold text-slate-700 mb-2"><i class="fa-solid fa-location-dot mr-1"></i>지역에 따른 발견 사실</label>
+                <textarea data-key="region_finding" rows="3" placeholder="예) 제주도에서 '고양이' 검색이 특히 많아요." class="w-full px-3 py-2 rounded-xl border-2 border-slate-200 focus:border-slate-400 outline-none resize-none"></textarea>
+            </div>
+        </div>
+    </section>
+
+    <!-- 공유 -->
+    <div class="mb-6 bg-teal-50 border-2 border-dashed border-teal-300 rounded-2xl p-4 no-print">
+        <p class="text-center text-sm text-teal-700 font-bold mb-2"><i class="fa-solid fa-share-nodes mr-1"></i>조사 결과를 사진으로 공유해요!</p>
+        <div class="flex flex-wrap gap-2 justify-center">
+            <button onclick="shareSaveImage('share-12-a1','데이터조사관')" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded-full text-sm shadow transition"><i class="fa-solid fa-download mr-1"></i>사진 저장</button>
+            <button onclick="shareCopyImage('share-12-a1')" class="bg-white border-2 border-teal-400 text-teal-600 font-bold py-2 px-4 rounded-full text-sm shadow transition hover:bg-teal-50"><i class="fa-solid fa-copy mr-1"></i>이미지 복사</button>
+        </div>
+        <div id="share-12-a1-share-status" class="text-center text-xs text-teal-600 mt-2 min-h-[1rem]"></div>
+    </div>
+
+    <div class="text-center no-print">
+        <button onclick="completeStep(1);goStep(2)" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-8 rounded-full text-lg shadow-lg hover:scale-105 active:scale-95 transition">
+            활동 2 (한 발짝 더)로 <i class="fa-solid fa-arrow-right ml-1"></i>
+        </button>
+    </div>
+</div>
+
+<!-- ===== 활동 2 ===== -->
+<div id="panel2" class="panel">
+    <section id="share-12-a2" class="bg-white rounded-3xl p-6 md:p-8 shadow-md border-b-8 border-rose-400 mb-6">
+        <h2 class="text-2xl font-bold text-rose-600 mb-2"><i class="fa-solid fa-heart-crack mr-2"></i>활동 2. 한 발짝 더, 동물 데이터를 들여다봐요</h2>
+        <p class="text-gray-500 mb-6">우리나라에는 매년 수많은 유기동물이 생겨요. 진짜 데이터를 직접 정리해 보고, 엔트리로 차트도 만들어 봐요.</p>
+
+        <!-- (1) 동물보호관리시스템 -->
+        <div class="bg-rose-50 rounded-2xl p-4 border-2 border-rose-100 mb-6">
+            <p class="text-rose-800 font-bold mb-2"><i class="fa-solid fa-database mr-1"></i>① 동물보호관리시스템에서 유기동물 공고 살펴보기</p>
+            <p class="text-gray-700 mb-2">사이트에서 <b class="text-rose-700">'보호중인 동물'</b> 또는 <b class="text-rose-700">'공고중인 동물'</b>을 검색해 우리 지역의 유기동물을 확인해 봐요.</p>
+            <a href="https://www.animal.go.kr/" target="_blank" class="inline-flex items-center gap-2 bg-white border-2 border-rose-400 text-rose-700 font-bold py-2 px-4 rounded-full text-sm hover:bg-rose-100 transition">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> 동물보호관리시스템 열기
+            </a>
+
+            <!-- 데이터 다운로드 -->
+            <div class="mt-4 bg-white rounded-2xl p-3 border-2 border-dashed border-rose-200">
+                <p class="text-sm text-rose-700 font-bold mb-2"><i class="fa-solid fa-file-csv mr-1"></i>빈 템플릿 내려받기 (직접 조사해서 채우기)</p>
+                <a href="data/abandoned_animals_template.csv" download class="inline-flex items-center gap-1 bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold py-1.5 px-3 rounded-full transition"><i class="fa-solid fa-download"></i> 유기동물 정리 템플릿 CSV</a>
+            </div>
+        </div>
+
+        <!-- (2) 종류·연도별 정리표 -->
+        <div class="mb-4">
+            <p class="text-base font-bold text-rose-700 mb-2"><i class="fa-solid fa-table mr-1"></i>② 종류·연도별 유기동물 변화 정리하기</p>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm md:text-base">
+                    <thead><tr class="bg-rose-50">
+                        <th class="py-3 px-3 text-rose-700 rounded-tl-xl">연도</th>
+                        <th class="py-3 px-3 text-rose-700"><i class="fa-solid fa-dog"></i> 개</th>
+                        <th class="py-3 px-3 text-rose-700"><i class="fa-solid fa-cat"></i> 고양이</th>
+                        <th class="py-3 px-3 text-rose-700 rounded-tr-xl"><i class="fa-solid fa-feather"></i> 그 외</th>
+                    </tr></thead>
+                    <tbody>
+                        <tr class="border-t border-rose-100">
+                            <td class="py-3 px-3 font-bold text-center">2022</td>
+                            <td class="py-3 px-3"><input data-key="y22_dog" type="number" placeholder="마리" class="w-full px-2 py-2 rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
+                            <td class="py-3 px-3"><input data-key="y22_cat" type="number" placeholder="마리" class="w-full px-2 py-2 rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
+                            <td class="py-3 px-3"><input data-key="y22_etc" type="number" placeholder="마리" class="w-full px-2 py-2 rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
+                        </tr>
+                        <tr class="border-t border-rose-100">
+                            <td class="py-3 px-3 font-bold text-center">2023</td>
+                            <td class="py-3 px-3"><input data-key="y23_dog" type="number" placeholder="마리" class="w-full px-2 py-2 rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
+                            <td class="py-3 px-3"><input data-key="y23_cat" type="number" placeholder="마리" class="w-full px-2 py-2 rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
+                            <td class="py-3 px-3"><input data-key="y23_etc" type="number" placeholder="마리" class="w-full px-2 py-2 rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
+                        </tr>
+                        <tr class="border-t border-rose-100">
+                            <td class="py-3 px-3 font-bold text-center">2024</td>
+                            <td class="py-3 px-3"><input data-key="y24_dog" type="number" placeholder="마리" class="w-full px-2 py-2 rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
+                            <td class="py-3 px-3"><input data-key="y24_cat" type="number" placeholder="마리" class="w-full px-2 py-2 rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
+                            <td class="py-3 px-3"><input data-key="y24_etc" type="number" placeholder="마리" class="w-full px-2 py-2 rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
+                        </tr>
+                        <tr class="border-t border-rose-100">
+                            <td class="py-3 px-3 font-bold text-center">2025</td>
+                            <td class="py-3 px-3"><input data-key="y25_dog" type="number" placeholder="마리" class="w-full px-2 py-2 rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
+                            <td class="py-3 px-3"><input data-key="y25_cat" type="number" placeholder="마리" class="w-full px-2 py-2 rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
+                            <td class="py-3 px-3"><input data-key="y25_etc" type="number" placeholder="마리" class="w-full px-2 py-2 rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- (3) 엔트리 시각화 -->
+        <div class="bg-emerald-50 rounded-2xl p-4 border-2 border-emerald-100 mb-4">
+            <p class="text-emerald-800 font-bold mb-2"><i class="fa-solid fa-chart-column mr-1"></i>③ 엔트리 '데이터 분석'으로 차트 그리기</p>
+            <p class="text-gray-700 mb-2">엔트리에 접속해서 <b>[작품 만들기] → [데이터분석] → [테이블 불러오기]</b> 순서로 위의 표를 입력하고, <b>그래프 보기</b>로 시각화해 봐요.</p>
+            <ol class="list-decimal pl-6 text-sm text-gray-600 space-y-1 mb-3">
+                <li>엔트리 회원가입 후 '작품 만들기'에 들어가요.</li>
+                <li>왼쪽 메뉴에서 '데이터분석' 블록을 골라 '테이블 불러오기'를 눌러요.</li>
+                <li>표를 직접 입력하거나 CSV로 붙여 넣어요.</li>
+                <li>'차트' 탭에서 <b>막대</b> 또는 <b>꺾은선</b>을 골라 그래프를 만들어요.</li>
+            </ol>
+            <a href="https://playentry.org/" target="_blank" class="inline-flex items-center gap-2 bg-gradient-to-r from-green-400 to-emerald-500 text-white font-bold py-2 px-5 rounded-full text-sm shadow-md hover:scale-105 transition">
+                <i class="fa-solid fa-code"></i> 엔트리 바로가기 <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+            </a>
+        </div>
+
+        <!-- (4) 그래프 보고 발견한 사실 -->
+        <div class="bg-rose-50 rounded-2xl p-4 border border-rose-100">
+            <label class="block text-base font-bold text-rose-700 mb-2"><i class="fa-solid fa-lightbulb mr-1"></i>그래프에서 발견한 사실</label>
+            <textarea data-key="entry_finding" rows="3" placeholder="예) 개 유기 수는 줄지만 고양이는 늘었어요. 그래서 ~ 하다고 생각해요." class="w-full px-3 py-2 rounded-xl border-2 border-rose-200 focus:border-rose-400 outline-none resize-none"></textarea>
+        </div>
+    </section>
+
+    <!-- 공유 -->
+    <div class="mb-6 bg-rose-50 border-2 border-dashed border-rose-300 rounded-2xl p-4 no-print">
+        <p class="text-center text-sm text-rose-700 font-bold mb-2"><i class="fa-solid fa-share-nodes mr-1"></i>유기동물 보고서를 사진으로 공유해요!</p>
+        <div class="flex flex-wrap gap-2 justify-center">
+            <button onclick="shareSaveImage('share-12-a2','유기동물보고서')" class="bg-rose-500 hover:bg-rose-600 text-white font-bold py-2 px-4 rounded-full text-sm shadow transition"><i class="fa-solid fa-download mr-1"></i>사진 저장</button>
+            <button onclick="shareCopyImage('share-12-a2')" class="bg-white border-2 border-rose-400 text-rose-600 font-bold py-2 px-4 rounded-full text-sm shadow transition hover:bg-rose-50"><i class="fa-solid fa-copy mr-1"></i>이미지 복사</button>
+        </div>
+        <div id="share-12-a2-share-status" class="text-center text-xs text-rose-600 mt-2 min-h-[1rem]"></div>
+    </div>
+
+    <div class="text-center no-print flex justify-center gap-3">
+        <button onclick="goStep(1)" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-3 px-6 rounded-full text-lg transition"><i class="fa-solid fa-arrow-left mr-1"></i> 활동 1</button>
+        <button onclick="completeStep(2);goStep(3)" class="bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 px-8 rounded-full text-lg shadow-lg hover:scale-105 active:scale-95 transition">활동 3 (여러 종류)로 <i class="fa-solid fa-arrow-right ml-1"></i></button>
+    </div>
+</div>
+
+<!-- ===== 활동 3 ===== -->
+<div id="panel3" class="panel">
+    <section id="share-12-a3" class="bg-white rounded-3xl p-6 md:p-8 shadow-md border-b-8 border-amber-400 mb-6">
+        <h2 class="text-2xl font-bold text-amber-700 mb-2"><i class="fa-solid fa-house-chimney-user mr-2"></i>활동 3. 여러 종류의 반려동물을 살펴봐요</h2>
+        <p class="text-gray-500 mb-6">우리나라 가정에서는 어떤 동물을 키우고 있을까요? 통계청 자료로 살펴보고, 나의 새 가족 후보도 골라 봐요.</p>
+
+        <!-- (1) KOSIS 양육 가구 비율 -->
+        <div class="bg-amber-50 rounded-2xl p-4 border-2 border-amber-100 mb-6">
+            <p class="text-amber-800 font-bold mb-2"><i class="fa-solid fa-chart-pie mr-1"></i>① 우리나라에서 가장 많이 키우는 반려동물은?</p>
+            <p class="text-gray-700 mb-3">2025년 <b>국가승인통계</b>(반려동물 양육현황 조사) 결과를 살펴봐요.</p>
+            <div class="bg-white rounded-2xl p-4 border border-amber-100">
+                <canvas id="speciesChart" height="200"></canvas>
+                <p class="text-xs text-gray-400 mt-1">출처: 농림축산식품부·검역본부 「2025년 반려동물 양육현황 조사」(국가승인통계, 양육가구 n=867, 중복응답)</p>
+            </div>
+
+            <!-- 데이터 다운로드 -->
+            <div class="mt-4 bg-white rounded-2xl p-3 border-2 border-dashed border-amber-200">
+                <p class="text-sm text-amber-700 font-bold mb-2"><i class="fa-solid fa-file-csv mr-1"></i>데이터셋 내려받기</p>
+                <div class="flex flex-wrap gap-2">
+                    <a href="data/pet_ownership_2025_summary.csv" download class="inline-flex items-center gap-1 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold py-1.5 px-3 rounded-full transition"><i class="fa-solid fa-download"></i> 양육 가구·종류별 비율</a>
+                    <a href="data/pet_count_per_household_2025.csv" download class="inline-flex items-center gap-1 bg-white border-2 border-amber-400 text-amber-700 text-xs font-bold py-1.5 px-3 rounded-full hover:bg-amber-50 transition"><i class="fa-solid fa-download"></i> 평균 양육 마릿수</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- (2) 놀라운 발견 카드 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+            <div class="bg-teal-50 rounded-2xl p-4 border border-teal-100 text-center">
+                <p class="text-3xl text-teal-600 font-bold">29.2<span class="text-base">%</span></p>
+                <p class="text-sm text-teal-700">우리나라 가구 중<br>반려동물을 키우는 비율</p>
+            </div>
+            <div class="bg-amber-50 rounded-2xl p-4 border border-amber-100 text-center">
+                <p class="text-3xl text-amber-600 font-bold">13.1<span class="text-base">마리</span></p>
+                <p class="text-sm text-amber-700">어류를 키우는 집은<br>평균 이만큼!</p>
+            </div>
+            <div class="bg-rose-50 rounded-2xl p-4 border border-rose-100 text-center">
+                <p class="text-3xl text-rose-600 font-bold">6년 5개월</p>
+                <p class="text-sm text-rose-700">반려동물과 함께한<br>평균 시간</p>
+            </div>
+        </div>
+
+        <!-- (3) 새롭게 늘어난 동물 칩 -->
+        <div class="mb-6">
+            <p class="text-base font-bold text-amber-700 mb-2"><i class="fa-solid fa-paw mr-1"></i>② 우리 곁의 다양해진 반려동물 (관심 가는 동물을 모두 골라요)</p>
+            <p class="text-xs text-gray-500 mb-2">※ 동물보호법상 등록 대상 반려동물 6종: 개·고양이·토끼·페럿·기니피그·햄스터</p>
+            <div class="flex flex-wrap gap-2">
+                <label class="chip"><input data-key="new_dog" type="checkbox"><span class="chip-box">🐶 개</span></label>
+                <label class="chip"><input data-key="new_cat" type="checkbox"><span class="chip-box">🐱 고양이</span></label>
+                <label class="chip"><input data-key="new_rabbit" type="checkbox"><span class="chip-box">🐰 토끼</span></label>
+                <label class="chip"><input data-key="new_ferret" type="checkbox"><span class="chip-box">🦦 페럿</span></label>
+                <label class="chip"><input data-key="new_guinea" type="checkbox"><span class="chip-box">🐹 기니피그</span></label>
+                <label class="chip"><input data-key="new_hamster" type="checkbox"><span class="chip-box">🐭 햄스터</span></label>
+                <label class="chip"><input data-key="new_parrot" type="checkbox"><span class="chip-box">🦜 앵무새</span></label>
+                <label class="chip"><input data-key="new_lizard" type="checkbox"><span class="chip-box">🦎 도마뱀</span></label>
+                <label class="chip"><input data-key="new_turtle" type="checkbox"><span class="chip-box">🐢 거북이</span></label>
+                <label class="chip"><input data-key="new_fish" type="checkbox"><span class="chip-box">🐠 열대어</span></label>
+            </div>
+        </div>
+
+        <!-- (4) 내가 좋아하는 동물 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-amber-50 rounded-2xl p-4 border border-amber-100">
+                <label class="block text-base font-bold text-amber-700 mb-2"><i class="fa-solid fa-star mr-1"></i>③ 내가 가장 좋아하는 동물</label>
+                <input data-key="pick1" type="text" placeholder="고른 동물 이름" class="w-full px-3 py-2 rounded-xl border-2 border-amber-200 focus:border-amber-400 outline-none mb-2">
+                <textarea data-key="pick1_why" rows="3" placeholder="이 친구를 고른 이유를 적어 봐요." class="w-full px-3 py-2 rounded-xl border-2 border-amber-200 focus:border-amber-400 outline-none resize-none"></textarea>
+            </div>
+            <div class="bg-teal-50 rounded-2xl p-4 border border-teal-100">
+                <label class="block text-base font-bold text-teal-700 mb-2"><i class="fa-solid fa-bridge mr-1"></i>다음 시간으로 이어가기</label>
+                <p class="text-sm text-gray-600 mb-2">3~4차시에는 인공지능과 함께 이 친구를 만나볼 거예요. 가장 궁금한 것은 무엇인가요?</p>
+                <textarea data-key="next_question" rows="3" placeholder="예) 이 동물은 어떤 먹이를 좋아할까? 어떻게 생겼을까?" class="w-full px-3 py-2 rounded-xl border-2 border-teal-200 focus:border-teal-400 outline-none resize-none"></textarea>
+            </div>
+        </div>
+    </section>
+
+    <!-- 공유 -->
+    <div class="mb-6 bg-amber-50 border-2 border-dashed border-amber-300 rounded-2xl p-4 no-print">
+        <p class="text-center text-sm text-amber-700 font-bold mb-2"><i class="fa-solid fa-share-nodes mr-1"></i>나의 동물 카드를 사진으로 공유해요!</p>
+        <div class="flex flex-wrap gap-2 justify-center">
+            <button onclick="shareSaveImage('share-12-a3','나의동물카드')" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-4 rounded-full text-sm shadow transition"><i class="fa-solid fa-download mr-1"></i>사진 저장</button>
+            <button onclick="shareCopyImage('share-12-a3')" class="bg-white border-2 border-amber-400 text-amber-600 font-bold py-2 px-4 rounded-full text-sm shadow transition hover:bg-amber-50"><i class="fa-solid fa-copy mr-1"></i>이미지 복사</button>
+        </div>
+        <div id="share-12-a3-share-status" class="text-center text-xs text-amber-600 mt-2 min-h-[1rem]"></div>
+    </div>
+
+    <div class="text-center no-print flex justify-center gap-3">
+        <button onclick="goStep(2)" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-3 px-6 rounded-full text-lg transition"><i class="fa-solid fa-arrow-left mr-1"></i> 활동 2</button>
+        <button onclick="completeStep(3);showToast('1~2차시 활동을 모두 완료했어요!')" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-8 rounded-full text-lg shadow-lg hover:scale-105 active:scale-95 transition"><i class="fa-solid fa-flag-checkered mr-1"></i> 모두 완료!</button>
+    </div>
+</div>
+
+</main>
+
+<footer class="text-center text-gray-400 text-sm mt-12">
+    <p><i class="fa-solid fa-heart text-rose-300"></i> 데이터로 만나는 반려동물 사회 · 1~2차시 문제 마주보기 <i class="fa-solid fa-heart text-rose-300"></i></p>
+</footer>
+
+<div id="toast"></div>
+
+<script>
+const PREFIX='session12_';
+
+function goStep(n){
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    document.getElementById('panel'+n).classList.add('active');
+    document.querySelectorAll('.step-btn').forEach(b=>b.classList.remove('active'));
+    document.getElementById('step'+n+'btn').classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+    if(n===1) setTimeout(drawTrendChart,80);
+    if(n===3) setTimeout(drawSpeciesChart,80);
+}
+function completeStep(n){document.getElementById('step'+n+'btn').classList.add('done');showToast('활동 '+n+' 완료!');}
+function showToast(m){const t=document.getElementById('toast');t.innerText=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+
+function saveAll(){
+    document.querySelectorAll('[data-key]').forEach(el=>{
+        const v = el.type==='checkbox' ? (el.checked?'1':'') : el.value;
+        localStorage.setItem(PREFIX+el.dataset.key, v);
+    });
+}
+function loadAll(){
+    document.querySelectorAll('[data-key]').forEach(el=>{
+        const v=localStorage.getItem(PREFIX+el.dataset.key);
+        if(v===null) return;
+        if(el.type==='checkbox') el.checked = (v==='1');
+        else el.value = v;
+    });
+    const vote = localStorage.getItem(PREFIX+'vote');
+    if(vote) applyVoteStyle(vote);
+}
+function resetAll(){
+    if(!confirm('모든 입력을 초기화할까요?'))return;
+    document.querySelectorAll('[data-key]').forEach(el=>{
+        if(el.type==='checkbox') el.checked=false;
+        else el.value='';
+        localStorage.removeItem(PREFIX+el.dataset.key);
+    });
+    document.getElementById('voteDogBtn').classList.remove('picked','bg-amber-100');
+    document.getElementById('voteCatBtn').classList.remove('picked','bg-slate-100');
+    showToast('초기화 완료!');
+}
+
+function setVote(v){
+    document.getElementById('voteVal').value = v;
+    saveAll();
+    applyVoteStyle(v);
+}
+function applyVoteStyle(v){
+    const dog = document.getElementById('voteDogBtn');
+    const cat = document.getElementById('voteCatBtn');
+    dog.classList.toggle('picked', v==='dog');
+    dog.classList.toggle('bg-amber-100', v==='dog');
+    cat.classList.toggle('picked', v==='cat');
+    cat.classList.toggle('bg-slate-100', v==='cat');
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+    loadAll();
+    document.querySelectorAll('[data-key]').forEach(el=>{
+        el.addEventListener('input',saveAll);
+        el.addEventListener('change',saveAll);
+    });
+    drawTrendChart();
+});
+
+// ===== Chart 1: Google Trends (강아지 vs 고양이, 2021~2026 발췌) =====
+// 출처: Google Trends Worldwide CSV (2026-05 추출, 가장 큰 값 100으로 환산)
+let trendChartInst=null;
+function drawTrendChart(){
+    const el=document.getElementById('trendChart'); if(!el) return;
+    if(trendChartInst){trendChartInst.destroy();trendChartInst=null;}
+    const labels = ['2021','2022','2023','2024','2025-08','2026-05'];
+    const dog    = [   43,   51,   60,   55,   76,   55];
+    const cat    = [   58,   71,   85,   86,  100,   73];
+    trendChartInst = new Chart(el, {
+        type:'line',
+        data:{labels, datasets:[
+            {label:'🐶 강아지', data:dog, borderColor:'#D97706', backgroundColor:'rgba(217,119,6,.15)', tension:.3, borderWidth:3, pointRadius:5},
+            {label:'🐱 고양이', data:cat, borderColor:'#475569', backgroundColor:'rgba(71,85,105,.15)', tension:.3, borderWidth:3, pointRadius:5}
+        ]},
+        options:{
+            responsive:true,
+            plugins:{legend:{position:'bottom',labels:{font:{family:'Jua, sans-serif',size:14}}}},
+            scales:{y:{beginAtZero:true,max:110,ticks:{font:{family:'Jua, sans-serif'}}},x:{ticks:{font:{family:'Jua, sans-serif'}}}}
+        }
+    });
+}
+
+// ===== Chart 2: 2025 양육 반려동물 종류 =====
+let speciesChartInst=null;
+function drawSpeciesChart(){
+    const el=document.getElementById('speciesChart'); if(!el) return;
+    if(speciesChartInst){speciesChartInst.destroy();speciesChartInst=null;}
+    const data = {
+        labels:['개','고양이','어류','설치류·포유류\n(햄스터·토끼·기니피그)','조류\n(앵무새)','파충류\n(도마뱀·거북이)'],
+        datasets:[{label:'양육 가구 비율(%)', data:[80.5, 14.4, 4.1, 1.0, 0.7, 0.5],
+            backgroundColor:['#F59E0B','#64748B','#0EA5E9','#10B981','#A855F7','#84CC16'], borderRadius:8}]
+    };
+    speciesChartInst = new Chart(el, {
+        type:'bar', data,
+        options:{
+            indexAxis:'y',
+            responsive:true,
+            plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>c.parsed.x+'%'}}},
+            scales:{x:{beginAtZero:true,max:100,ticks:{callback:v=>v+'%',font:{family:'Jua, sans-serif'}}},
+                    y:{ticks:{font:{family:'Jua, sans-serif',size:12}}}}
+        }
+    });
+}
+
+// ===== 이미지 저장 / 복사 =====
+async function shareSaveImage(id,name){
+    const el=document.getElementById(id);
+    const statusEl=document.getElementById(id+'-share-status');
+    if(!el)return;
+    statusEl.textContent='이미지를 만들고 있어요...';
+    try{
+        const canvas=await html2canvas(el,{backgroundColor:'#ffffff',scale:2,useCORS:true});
+        const a=document.createElement('a');
+        a.download=(name||'활동지')+'.png';
+        a.href=canvas.toDataURL('image/png');
+        a.click();
+        statusEl.textContent='저장 완료!';
+        setTimeout(()=>statusEl.textContent='',2500);
+    }catch(e){
+        statusEl.textContent='저장 실패: '+e.message;
+    }
+}
+async function shareCopyImage(id){
+    const el=document.getElementById(id);
+    const statusEl=document.getElementById(id+'-share-status');
+    if(!el)return;
+    statusEl.textContent='이미지를 만들고 있어요...';
+    try{
+        const canvas=await html2canvas(el,{backgroundColor:'#ffffff',scale:2,useCORS:true});
+        canvas.toBlob(async blob=>{
+            try{
+                await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
+                statusEl.textContent='클립보드에 복사했어요!';
+            }catch(err){statusEl.textContent='이 브라우저는 이미지 복사를 지원하지 않아요. 사진 저장을 이용해 주세요.';}
+            setTimeout(()=>statusEl.textContent='',3000);
+        });
+    }catch(e){
+        statusEl.textContent='복사 실패: '+e.message;
+    }
+}
+</script>
+</body>
+</html>
