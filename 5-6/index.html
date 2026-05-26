@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>데이터로 만나는 반려동물 사회 - AI 양육 책임</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts & FontAwesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Nanum+Gothic:wght@400;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    body {
+      font-family: 'Nanum Gothic', sans-serif;
+      background-color: #f0fdfa; /* 밝은 민트빛 배경 */
+    }
+    .title-font {
+      font-family: 'Gaegu', cursive;
+    }
+    /* 스크롤바 디자인 */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen pb-12">
+
+  <!-- 상단 네비게이션 영역 -->
+  <header class="max-w-5xl mx-auto px-4 pt-6 flex flex-col gap-4">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <!-- 메인으로 버튼 -->
+      <button onclick="alert('메인 화면으로 이동합니다.')" class="bg-white border-2 border-teal-500 text-teal-600 px-4 py-2 rounded-full font-bold hover:bg-teal-50 transition-all flex items-center gap-2 shadow-sm">
+        <i class="fa-solid fa-arrow-left"></i> 메인으로
+      </button>
+
+      <!-- 차시 선택 버튼 그룹 -->
+      <div class="flex flex-wrap gap-1.5">
+        <button class="bg-teal-500 text-white px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm">1~2차시</button>
+        <button onclick="alert('준비 중인 차시입니다.')" class="bg-purple-100 text-purple-600 px-3.5 py-1.5 rounded-full text-xs font-bold hover:bg-purple-200 transition-all">3~4차시</button>
+        <button onclick="alert('준비 중인 차시입니다.')" class="bg-orange-100 text-orange-600 px-3.5 py-1.5 rounded-full text-xs font-bold hover:bg-orange-200 transition-all">5~6차시</button>
+        <button onclick="alert('준비 중인 차시입니다.')" class="bg-blue-100 text-blue-600 px-3.5 py-1.5 rounded-full text-xs font-bold hover:bg-blue-200 transition-all">7~8차시</button>
+        <button onclick="alert('준비 중인 차시입니다.')" class="bg-pink-100 text-pink-600 px-3.5 py-1.5 rounded-full text-xs font-bold hover:bg-pink-200 transition-all">9차시</button>
+      </div>
+    </div>
+
+    <!-- 유틸리티 버튼 (인쇄하기, 초기화) -->
+    <div class="flex justify-center gap-4 mt-2">
+      <button onclick="window.print()" class="bg-white border-2 border-purple-400 text-purple-600 px-5 py-2 rounded-full font-bold hover:bg-purple-50 transition-all flex items-center gap-2 shadow-sm text-sm">
+        <i class="fa-solid fa-print"></i> 인쇄하기
+      </button>
+      <button onclick="resetActivity()" class="bg-white border-2 border-rose-400 text-rose-500 px-5 py-2 rounded-full font-bold hover:bg-rose-50 transition-all flex items-center gap-2 shadow-sm text-sm">
+        <i class="fa-solid fa-rotate-right"></i> 초기화
+      </button>
+    </div>
+  </header>
+
+  <!-- 메인 컨텐츠 영역 -->
+  <main class="max-w-5xl mx-auto px-4 mt-8">
+    
+    <!-- 배너 타이틀 -->
+    <div class="text-center mb-8">
+      <span class="inline-block bg-teal-50 text-teal-600 border border-teal-300 rounded-full px-6 py-1 text-sm font-bold mb-3 shadow-sm">
+        1~2차시 · 문제 마주보기
+      </span>
+      <h1 class="text-3xl md:text-4xl text-teal-800 font-bold title-font flex items-center justify-center gap-2">
+        🐾 이미지 분류 AI로 실천하는 반려동물 양육 책임
+      </h1>
+      <p class="text-slate-600 mt-3 text-sm md:text-base leading-relaxed max-w-2xl mx-auto">
+        반려동물의 유익·유해 음식 데이터를 직접 수집하고 분류 모델을 학습시켜, <br class="hidden md:inline"/>
+        우리 동물을 안전하게 돌보는 똑똑한 인공지능 프로그램을 직접 만들어 보아요!
+      </p>
+    </div>
+
+    <!-- 탭 네비게이션 (활동 1, 2, 3 선택) -->
+    <div class="grid grid-cols-3 gap-3 mb-8">
+      <!-- 활동 1 탭 -->
+      <button id="tab-act1" onclick="switchActivity(1)" class="bg-white border-2 border-teal-400 text-teal-700 p-4 rounded-2xl shadow-sm hover:shadow-md transition-all flex flex-col items-center justify-center gap-1 active-tab-style">
+        <i class="fa-solid fa-magnifying-glass text-xl md:text-2xl text-teal-500"></i>
+        <span class="font-bold text-xs md:text-sm">활동 1</span>
+        <span class="text-[10px] md:text-xs text-slate-500">내 동물의 비밀식단 조사</span>
+      </button>
+      <!-- 활동 2 탭 -->
+      <button id="tab-act2" onclick="switchActivity(2)" class="bg-white border-2 border-slate-200 text-slate-600 p-4 rounded-2xl shadow-sm hover:shadow-md transition-all flex flex-col items-center justify-center gap-1">
+        <i class="fa-solid fa-heart text-xl md:text-2xl text-rose-400"></i>
+        <span class="font-bold text-xs md:text-sm">활동 2</span>
+        <span class="text-[10px] md:text-xs text-slate-500">먹이 분류 AI 학습</span>
+      </button>
+      <!-- 활동 3 탭 -->
+      <button id="tab-act3" onclick="switchActivity(3)" class="bg-white border-2 border-slate-200 text-slate-600 p-4 rounded-2xl shadow-sm hover:shadow-md transition-all flex flex-col items-center justify-center gap-1">
+        <i class="fa-solid fa-house-chimney text-xl md:text-2xl text-amber-500"></i>
+        <span class="font-bold text-xs md:text-sm">활동 3</span>
+        <span class="text-[10px] md:text-xs text-slate-500">안전 먹이 프로그램 코딩</span>
+      </button>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- [활동 1] 콘텐츠 영역 -->
+    <!-- ========================================================================= -->
+    <section id="content-act1" class="bg-white rounded-3xl p-6 md:p-8 shadow-md border-2 border-teal-100 transition-all">
+      <h2 class="text-xl md:text-2xl text-teal-800 font-bold flex items-center gap-2 mb-4">
+        <i class="fa-solid fa-magnifying-glass text-teal-500"></i> 활동 1. 내 동물의 '비밀 식단'을 조사해요
+      </h2>
+      <p class="text-slate-600 text-sm mb-6 leading-relaxed">
+        내가 기르고 싶은 나만의 반려동물을 디자인하고, 그 동물이 안전하게 먹을 수 있는 음식과 절대 먹으면 안 되는 음식을 수집해 보아요.
+      </p>
+
+      <!-- ① 반려동물 설정 -->
+      <div class="bg-teal-50/50 rounded-2xl p-5 border border-teal-100 mb-6">
+        <h3 class="font-bold text-teal-800 flex items-center gap-2 mb-3">
+          <span class="bg-teal-200 text-teal-800 rounded-full w-5 h-5 flex items-center justify-center text-xs">1</span>
+          내가 만든 나만의 반려동물은 무엇인가요?
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1">반려동물의 종류 (예: 우주 강아지, 베리 고양이 등)</label>
+            <input type="text" id="pet-name" placeholder="나만의 반려동물 종류를 적어주세요!" class="w-full p-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-400 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1">동물의 주요 생태적 특징 (예: 초콜릿을 보면 짖음 등)</label>
+            <input type="text" id="pet-feature" placeholder="생태적 특징이나 성격을 자유롭게 적어보세요." class="w-full p-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-400 text-sm">
+          </div>
+        </div>
+      </div>
+
+      <!-- ② 유익/유해 음식 정리 학습지 -->
+      <div class="bg-rose-50/50 rounded-2xl p-5 border border-rose-100 mb-6">
+        <h3 class="font-bold text-rose-800 flex items-center gap-2 mb-3">
+          <span class="bg-rose-200 text-rose-800 rounded-full w-5 h-5 flex items-center justify-center text-xs">2</span>
+          내 동물이 먹을 수 있는 유익한 음식과 위험한 유해 음식을 채워보세요.
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- 유익한 음식 -->
+          <div class="bg-white p-4 rounded-xl border border-teal-200">
+            <h4 class="font-bold text-teal-600 text-sm mb-2"><i class="fa-solid fa-circle-check"></i> 먹으면 유익한 음식 (정상 급여 가능)</h4>
+            <textarea id="food-good" rows="3" placeholder="예) 전용 사료, 연어, 신선한 당근, 물 등" class="w-full p-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-400 text-xs leading-relaxed"></textarea>
+          </div>
+          <!-- 유해한 음식 -->
+          <div class="bg-white p-4 rounded-xl border border-rose-200">
+            <h4 class="font-bold text-rose-500 text-sm mb-2"><i class="fa-solid fa-triangle-exclamation"></i> 먹으면 유해한 음식 (급여 불가!)</h4>
+            <textarea id="food-bad" rows="3" placeholder="예) 초콜릿, 포도, 익힌 양파, 닭뼈 등" class="w-full p-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-rose-400 text-xs leading-relaxed"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- ③ AI 학습용 클래스(카테고리) 설계 -->
+      <div class="bg-amber-50/50 rounded-2xl p-5 border border-amber-100">
+        <h3 class="font-bold text-amber-800 flex items-center gap-2 mb-2">
+          <span class="bg-amber-200 text-amber-800 rounded-full w-5 h-5 flex items-center justify-center text-xs">3</span>
+          인공지능에게 학습시킬 먹이 분류 카테고리(클래스) 설계하기
+        </h3>
+        <p class="text-xs text-slate-500 mb-3">인공지능 모델이 확실하게 구분할 수 있도록 2가지 이상의 클래스를 명명해 주세요.</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-white p-3 rounded-xl border border-amber-200">
+            <span class="text-xs font-bold text-teal-600">클래스 1 이름 (유익한 음식 그룹)</span>
+            <input type="text" id="class1-name" value="안전한 먹이" class="w-full mt-1 p-2 rounded border border-slate-300 text-xs focus:ring-1 focus:ring-teal-400">
+          </div>
+          <div class="bg-white p-3 rounded-xl border border-amber-200">
+            <span class="text-xs font-bold text-rose-500">클래스 2 이름 (유해한 음식 그룹)</span>
+            <input type="text" id="class2-name" value="위험한 음식" class="w-full mt-1 p-2 rounded border border-slate-300 text-xs focus:ring-1 focus:ring-rose-400">
+          </div>
+        </div>
+      </div>
+
+      <!-- 다음 활동 이동 버튼 -->
+      <div class="mt-8 flex justify-end">
+        <button onclick="switchActivity(2)" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-6 rounded-full flex items-center gap-2 shadow-md transition-all">
+          활동 2 (똑똑한 AI 학습하기) 로 <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- [활동 2] 콘텐츠 영역 -->
+    <!-- ========================================================================= -->
+    <section id="content-act2" class="bg-white rounded-3xl p-6 md:p-8 shadow-md border-2 border-rose-100 hidden transition-all">
+      <h2 class="text-xl md:text-2xl text-rose-800 font-bold flex items-center gap-2 mb-4">
+        <i class="fa-solid fa-heart text-rose-500"></i> 활동 2. 똑똑한 '먹이 분류 AI'를 학습시켜요
+      </h2>
+      <p class="text-slate-600 text-sm mb-6">
+        활동 1에서 정의한 클래스별로 먹이 데이터를 업로드 및 탐색하고, 학습된 인공지능이 새로운 사진을 얼마나 정확히 분류하는지 가상 테스트를 진행합니다.
+      </p>
+
+      <!-- ① 데이터셋 탑색 / 이미지 카드 업로드 -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- 왼쪽: 클래스 1 (안전) 학습 데이터 설정 -->
+        <div class="bg-teal-50/40 border border-teal-200 rounded-2xl p-4">
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="font-bold text-teal-700 text-sm flex items-center gap-1">
+              <i class="fa-regular fa-folder-open"></i> [클래스 1] <span class="class1-label font-bold text-teal-800">안전한 먹이</span>
+            </h4>
+            <span class="text-[10px] bg-teal-100 text-teal-800 px-2 py-0.5 rounded-full font-bold">학습 데이터 수: <span id="c1-count">4</span>장</span>
+          </div>
+
+          <!-- 샘플 학습 데이터 카드 그리드 -->
+          <div class="grid grid-cols-4 gap-2 mb-3" id="c1-gallery">
+            <div class="aspect-square bg-white border border-slate-200 rounded-lg p-1 relative flex flex-col items-center justify-center">
+              <span class="text-xl">🥩</span>
+              <span class="text-[9px] text-slate-500 font-semibold mt-1">고기</span>
+            </div>
+            <div class="aspect-square bg-white border border-slate-200 rounded-lg p-1 relative flex flex-col items-center justify-center">
+              <span class="text-xl">🥕</span>
+              <span class="text-[9px] text-slate-500 font-semibold mt-1">당근</span>
+            </div>
+            <div class="aspect-square bg-white border border-slate-200 rounded-lg p-1 relative flex flex-col items-center justify-center">
+              <span class="text-xl">🍎</span>
+              <span class="text-[9px] text-slate-500 font-semibold mt-1">사과</span>
+            </div>
+            <div class="aspect-square bg-white border border-slate-200 rounded-lg p-1 relative flex flex-col items-center justify-center">
+              <span class="text-xl">🥬</span>
+              <span class="text-[9px] text-slate-500 font-semibold mt-1">채소</span>
+            </div>
+          </div>
+          <!-- 학습 데이터 직접 추가 기능 -->
+          <div class="flex gap-1.5">
+            <input type="text" id="c1-add-input" placeholder="새로운 안전 음식 입력 (예: 단호박)" class="flex-1 p-1.5 text-xs rounded border border-slate-300 focus:outline-none">
+            <button onclick="addTrainingData(1)" class="bg-teal-600 hover:bg-teal-700 text-white text-xs px-3 py-1.5 rounded font-bold">추가</button>
+          </div>
+        </div>
+
+        <!-- 오른쪽: 클래스 2 (위험) 학습 데이터 설정 -->
+        <div class="bg-rose-50/40 border border-rose-200 rounded-2xl p-4">
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="font-bold text-rose-700 text-sm flex items-center gap-1">
+              <i class="fa-regular fa-folder-open"></i> [클래스 2] <span class="class2-label font-bold text-rose-800">위험한 음식</span>
+            </h4>
+            <span class="text-[10px] bg-rose-100 text-rose-800 px-2 py-0.5 rounded-full font-bold">학습 데이터 수: <span id="c2-count">4</span>장</span>
+          </div>
+
+          <!-- 샘플 학습 데이터 카드 그리드 -->
+          <div class="grid grid-cols-4 gap-2 mb-3" id="c2-gallery">
+            <div class="aspect-square bg-white border border-slate-200 rounded-lg p-1 relative flex flex-col items-center justify-center">
+              <span class="text-xl">🍫</span>
+              <span class="text-[9px] text-slate-500 font-semibold mt-1">초콜릿</span>
+            </div>
+            <div class="aspect-square bg-white border border-slate-200 rounded-lg p-1 relative flex flex-col items-center justify-center">
+              <span class="text-xl">🍇</span>
+              <span class="text-[9px] text-slate-500 font-semibold mt-1">포도</span>
+            </div>
+            <div class="aspect-square bg-white border border-slate-200 rounded-lg p-1 relative flex flex-col items-center justify-center">
+              <span class="text-xl">🧅</span>
+              <span class="text-[9px] text-slate-500 font-semibold mt-1">양파</span>
+            </div>
+            <div class="aspect-square bg-white border border-slate-200 rounded-lg p-1 relative flex flex-col items-center justify-center">
+              <span class="text-xl">☕</span>
+              <span class="text-[9px] text-slate-500 font-semibold mt-1">커피</span>
+            </div>
+          </div>
+          <!-- 학습 데이터 직접 추가 기능 -->
+          <div class="flex gap-1.5">
+            <input type="text" id="c2-add-input" placeholder="새로운 위험 음식 입력 (예: 닭뼈)" class="flex-1 p-1.5 text-xs rounded border border-slate-300 focus:outline-none">
+            <button onclick="addTrainingData(2)" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5 rounded font-bold">추가</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ② 가상 모델 학습 및 테스트 영역 -->
+      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 mb-6">
+        <h3 class="font-bold text-slate-800 text-base mb-4 flex items-center gap-1.5">
+          <i class="fa-solid fa-network-wired text-indigo-500"></i> AI 모델 즉석 학습 및 추론 시뮬레이터
+        </h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+          
+          <!-- 1단계: 모델 학습 실행 -->
+          <div class="flex flex-col items-center text-center p-4 bg-white rounded-xl border border-slate-200">
+            <div class="bg-indigo-50 text-indigo-600 rounded-full w-10 h-10 flex items-center justify-center font-bold text-lg mb-2">1</div>
+            <span class="font-bold text-sm mb-1">인공지능 모델 학습</span>
+            <p class="text-[11px] text-slate-500 mb-3">설정된 클래스 데이터를 기반으로 인공지능에게 먹이 패턴을 학습시킵니다.</p>
+            <button id="btn-train" onclick="trainModel()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition-all shadow-sm">
+              <i class="fa-solid fa-gears mr-1"></i> 모델 학습 시작하기
+            </button>
+            <!-- 프로그레스 바 -->
+            <div id="train-progress-container" class="w-full bg-slate-100 rounded-full h-2 mt-3 hidden">
+              <div id="train-progress-bar" class="bg-indigo-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <span id="train-status" class="text-[11px] text-slate-500 font-semibold mt-1">대기 중...</span>
+          </div>
+
+          <!-- 2단계: 테스트할 음식 선택 -->
+          <div class="flex flex-col items-center text-center p-4 bg-white rounded-xl border border-slate-200">
+            <div class="bg-teal-50 text-teal-600 rounded-full w-10 h-10 flex items-center justify-center font-bold text-lg mb-2">2</div>
+            <span class="font-bold text-sm mb-1">테스트할 음식 사진 제시</span>
+            <p class="text-[11px] text-slate-500 mb-2">카메라에 보여줄 테스트 음식을 선택해 주세요.</p>
+            <div class="grid grid-cols-4 gap-1.5 mb-2 w-full">
+              <button onclick="selectTestFood('🍎', '사과')" class="bg-slate-50 border hover:bg-teal-50 hover:border-teal-300 text-lg p-1 rounded transition-all">🍎</button>
+              <button onclick="selectTestFood('🥩', '소고기')" class="bg-slate-50 border hover:bg-teal-50 hover:border-teal-300 text-lg p-1 rounded transition-all">🥩</button>
+              <button onclick="selectTestFood('🍫', '초콜릿')" class="bg-slate-50 border hover:bg-teal-50 hover:border-teal-300 text-lg p-1 rounded transition-all">🍫</button>
+              <button onclick="selectTestFood('🧅', '양파')" class="bg-slate-50 border hover:bg-teal-50 hover:border-teal-300 text-lg p-1 rounded transition-all">🧅</button>
+              <button onclick="selectTestFood('🥦', '브로콜리')" class="bg-slate-50 border hover:bg-teal-50 hover:border-teal-300 text-lg p-1 rounded transition-all">🥦</button>
+              <button onclick="selectTestFood('🍕', '피자')" class="bg-slate-50 border hover:bg-teal-50 hover:border-teal-300 text-lg p-1 rounded transition-all">🍕</button>
+              <button onclick="selectTestFood('🍇', '포도')" class="bg-slate-50 border hover:bg-teal-50 hover:border-teal-300 text-lg p-1 rounded transition-all">🍇</button>
+              <button id="custom-test-btn" onclick="triggerCustomTest()" class="bg-slate-100 border text-xs font-bold p-1 rounded text-slate-600 flex items-center justify-center">직접</button>
+            </div>
+            <div class="text-xs bg-slate-100 p-1.5 rounded w-full flex items-center justify-center gap-2">
+              <span id="test-food-emoji" class="text-lg">🍎</span>
+              <span id="test-food-name" class="font-bold text-slate-700">사과 (기본값)</span>
+            </div>
+          </div>
+
+          <!-- 3단계: 정확도 판별 및 모델 결과 -->
+          <div class="flex flex-col items-center text-center p-4 bg-white rounded-xl border border-slate-200">
+            <div class="bg-rose-50 text-rose-600 rounded-full w-10 h-10 flex items-center justify-center font-bold text-lg mb-2">3</div>
+            <span class="font-bold text-sm mb-1">인공지능 인식 정확도</span>
+            <p class="text-[11px] text-slate-500 mb-3">AI가 학습 데이터 정보를 토대로 먹이를 분류한 결과입니다.</p>
+            
+            <div class="w-full bg-slate-50 border rounded-lg p-3">
+              <!-- 클래스 1 정확도 -->
+              <div class="mb-2">
+                <div class="flex justify-between text-[11px] font-bold text-teal-800 mb-1">
+                  <span class="class1-label">안전한 먹이</span>
+                  <span id="result-c1-percentage">0%</span>
+                </div>
+                <div class="w-full bg-slate-200 h-2 rounded-full">
+                  <div id="result-c1-bar" class="bg-teal-500 h-2 rounded-full transition-all" style="width: 0%"></div>
+                </div>
+              </div>
+              <!-- 클래스 2 정확도 -->
+              <div>
+                <div class="flex justify-between text-[11px] font-bold text-rose-800 mb-1">
+                  <span class="class2-label">위험한 음식</span>
+                  <span id="result-c2-percentage">0%</span>
+                </div>
+                <div class="w-full bg-slate-200 h-2 rounded-full">
+                  <div id="result-c2-bar" class="bg-rose-500 h-2 rounded-full transition-all" style="width: 0%"></div>
+                </div>
+              </div>
+            </div>
+
+            <button onclick="runClassification()" class="w-full mt-2 bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold py-2 px-4 rounded-lg transition-all shadow-sm">
+              <i class="fa-solid fa-magnifying-glass mr-1"></i> 분류 시뮬레이션 실행
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 발견 사실 적기 학습칸 -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-amber-50 rounded-2xl p-4 border border-amber-200">
+          <h4 class="font-bold text-amber-900 text-sm mb-2"><i class="fa-solid fa-pencil"></i> 학습 데이터의 수와 다양성이 중요한 이유</h4>
+          <textarea id="finding-1" rows="3" placeholder="예) 학습 데이터가 많고 다양할수록 AI의 분류 정확도가 높아져 실제 상황에서 오작동을 줄일 수 있습니다." class="w-full p-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-400 text-xs leading-relaxed bg-white"></textarea>
+        </div>
+        <div class="bg-blue-50 rounded-2xl p-4 border border-blue-200">
+          <h4 class="font-bold text-blue-900 text-sm mb-2"><i class="fa-solid fa-circle-question"></i> 학습되지 않은 낯선 먹이 사진을 넣는다면?</h4>
+          <textarea id="finding-2" rows="3" placeholder="예) AI가 해당 먹이를 엉뚱하게 오판하거나 안전하지 않은 음식을 유익한 음식으로 잘못 판정해 반려동물이 아플 수 있습니다." class="w-full p-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400 text-xs leading-relaxed bg-white"></textarea>
+        </div>
+      </div>
+
+      <!-- 다음 활동 이동 버튼 -->
+      <div class="mt-8 flex justify-between">
+        <button onclick="switchActivity(1)" class="border-2 border-teal-500 hover:bg-teal-50 text-teal-600 font-bold py-3 px-6 rounded-full flex items-center gap-2 transition-all">
+          <i class="fa-solid fa-chevron-left"></i> 이전 활동 1로
+        </button>
+        <button onclick="switchActivity(3)" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-6 rounded-full flex items-center gap-2 shadow-md transition-all">
+          활동 3 (안전 코딩 및 토의) 으로 <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- [활동 3] 콘텐츠 영역 -->
+    <!-- ========================================================================= -->
+    <section id="content-act3" class="bg-white rounded-3xl p-6 md:p-8 shadow-md border-2 border-amber-100 hidden transition-all">
+      <h2 class="text-xl md:text-2xl text-amber-800 font-bold flex items-center gap-2 mb-4">
+        <i class="fa-solid fa-house-chimney text-amber-500"></i> 활동 3. 책임감 있는 '안전 먹이 프로그램'을 만들어요
+      </h2>
+      <p class="text-slate-600 text-sm mb-6">
+        학습된 이미지 분류 모델을 프로그램에 적용해 봅시다. 엔트리 코딩 블록의 구조를 설계하고 결과에 따른 올바른 양육 방향을 토론해 보아요.
+      </p>
+
+      <!-- ① 블록 코딩 시뮬레이션 -->
+      <div class="bg-amber-50/50 border border-amber-200 rounded-2xl p-5 mb-6">
+        <h3 class="font-bold text-amber-900 text-sm mb-3 flex items-center gap-1.5">
+          <i class="fa-solid fa-puzzle-piece text-amber-500"></i> 엔트리형 AI 스캔 기능 및 동물 양육 반응 코딩 블록 완성하기
+        </h3>
+        <p class="text-xs text-slate-500 mb-4">
+          오브젝트(반려동물)를 클릭하여 실시간 이미지 인식이 되었을 때, 조건문을 설계하고 각 결과에 알맞은 반응 블록을 정비하세요.
+        </p>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- 왼쪽: 블록 조립 미리보기 -->
+          <div class="bg-slate-900 text-white rounded-xl p-4 font-mono text-xs flex flex-col gap-2.5">
+            <span class="text-slate-400 font-sans font-bold">// 가상 엔트리 코딩 스크립트 블록</span>
+            
+            <div class="bg-indigo-600 text-white px-3 py-1.5 rounded-md font-bold flex items-center gap-2">
+              <i class="fa-solid fa-play"></i> [오브젝트를 클릭했을 때]
+            </div>
+
+            <div class="bg-indigo-500 text-white ml-3 px-3 py-1.5 rounded-md font-bold flex items-center gap-2">
+              <i class="fa-solid fa-camera"></i> [실시간 이미지 스캔 시작하기]
+            </div>
+
+            <!-- 만약 조건문 1 -->
+            <div class="bg-rose-500 text-white ml-3 p-3 rounded-md font-bold flex flex-col gap-2">
+              <div class="flex items-center gap-1">
+                <span>만약</span>
+                <span class="bg-rose-700 px-2 py-0.5 rounded text-[10px] text-yellow-200 font-semibold">[이미지 인식 결과]</span>
+                <span>가</span>
+                <span class="class1-label text-yellow-300">"안전한 먹이"</span>
+                <span>(이)라면?</span>
+              </div>
+              <div class="bg-slate-800 text-slate-200 font-sans p-2 rounded text-[11px] font-normal flex flex-col gap-1.5">
+                <div>동물의 체력을 <input type="number" id="block-heal-val" value="10" class="w-12 bg-slate-700 text-white border border-slate-500 rounded text-center text-[10px] p-0.5"> 만큼 증가시키기</div>
+                <div>동물이 <input type="text" id="block-heal-msg" value="냠냠 맛있다! 체력이 솟아나!" class="w-full bg-slate-700 text-white border border-slate-500 rounded text-[10px] p-0.5 mt-1"> 라고 말하기</div>
+              </div>
+            </div>
+
+            <!-- 만약 조건문 2 -->
+            <div class="bg-rose-500 text-white ml-3 p-3 rounded-md font-bold flex flex-col gap-2">
+              <div class="flex items-center gap-1">
+                <span>만약</span>
+                <span class="bg-rose-700 px-2 py-0.5 rounded text-[10px] text-yellow-200 font-semibold">[이미지 인식 결과]</span>
+                <span>가</span>
+                <span class="class2-label text-yellow-300">"위험한 음식"</span>
+                <span>(이)라면?</span>
+              </div>
+              <div class="bg-slate-800 text-slate-200 font-sans p-2 rounded text-[11px] font-normal flex flex-col gap-1.5">
+                <div class="text-rose-400 font-semibold">경고 사이렌 소리 울리기 및 경고 창 표시</div>
+                <div>동물이 <input type="text" id="block-warn-msg" value="으악! 이건 먹을 수 없어! 위험해!" class="w-full bg-slate-700 text-white border border-slate-500 rounded text-[10px] p-0.5 mt-1"> 라고 경고하기</div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- 오른쪽: 코딩 작동 실시간 시뮬레이션 -->
+          <div class="bg-white rounded-xl border border-slate-200 p-4 flex flex-col justify-between">
+            <div>
+              <h4 class="font-bold text-slate-800 text-xs mb-3 flex items-center gap-1">
+                <i class="fa-solid fa-laptop-code text-teal-500"></i> 코딩 프로그램 작동 테스트 (실시간 가상 에뮬레이터)
+              </h4>
+              <div class="bg-slate-100 rounded-lg p-4 flex flex-col items-center justify-center min-h-[160px] relative overflow-hidden" id="screen-container">
+                <!-- 가상 동물 캐릭터 일러스트 (Emoji) -->
+                <div class="text-6xl animate-bounce mb-2" id="sim-pet-avatar">🐶</div>
+                <div class="text-xs bg-slate-700 text-white px-2 py-0.5 rounded-full mb-1">우리집 반려동물</div>
+                <div class="text-[11px] text-slate-500 font-semibold">체력: <span id="sim-health" class="text-emerald-600 font-bold">100</span></div>
+
+                <!-- 에뮬레이터 말풍선 메세지 -->
+                <div id="sim-bubble" class="absolute top-2 right-2 left-2 bg-yellow-100 border border-yellow-300 text-slate-800 p-2 rounded-lg text-xs font-semibold text-center hidden shadow-sm">
+                  안녕하세요! 먹이 스캔을 눌러주세요.
+                </div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 mt-4">
+              <button onclick="simulateFeeding(1)" class="bg-teal-500 hover:bg-teal-600 text-white text-xs font-bold py-2 rounded-lg transition-all shadow-sm">
+                🍏 [안전한 먹이] 인식 결과 주입
+              </button>
+              <button onclick="simulateFeeding(2)" class="bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold py-2 rounded-lg transition-all shadow-sm">
+                ☠️ [위험한 음식] 인식 결과 주입
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ② 동물 양육 책임감 심화 토의 -->
+      <div class="bg-pink-50/50 border border-pink-200 rounded-2xl p-5">
+        <h3 class="font-bold text-pink-900 text-sm mb-3 flex items-center gap-1.5">
+          <i class="fa-solid fa-comments text-pink-500"></i> 데이터 학습 불충분으로 인해 발생할 수 있는 동물의 양육 책임과 위협 요소 토론하기
+        </h3>
+        <p class="text-xs text-slate-500 mb-4 leading-relaxed">
+          만약 인공지능에 학습 데이터를 제대로 수집하지 않거나 게으르게 검증했을 경우, 동물에게 직접적으로 끼칠 피해와 우리들이 가져야 할 양육 책임감에 대해 적어주세요.
+        </p>
+
+        <div class="bg-white p-4 rounded-xl border border-pink-200">
+          <span class="block text-xs font-bold text-slate-500 mb-2">동료들과 깊이 논의해 보고 나의 최종 생각을 한 문장으로 정리하세요:</span>
+          <textarea id="discussion-text" rows="4" placeholder="예시) 우리가 AI 프로그램을 만드는 데 있어 데이터가 불충분할 경우 인공지능이 유해한 물질을 안전하다고 판단하여 동물의 목숨이 위태로울 수 있습니다. 그러므로 이미지 학습 및 교차 검증은 사람의 편리성뿐만 아니라 소중한 생명을 온전히 지키기 위한 강한 책임감이 담긴 필수적인 일입니다." class="w-full p-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-pink-400 text-xs leading-relaxed"></textarea>
+        </div>
+      </div>
+
+      <!-- 이전 활동 이동 및 공유하기 영역 -->
+      <div class="mt-8 flex flex-col items-center gap-4">
+        <div class="flex justify-between w-full">
+          <button onclick="switchActivity(2)" class="border-2 border-teal-500 hover:bg-teal-50 text-teal-600 font-bold py-3 px-6 rounded-full flex items-center gap-2 transition-all">
+            <i class="fa-solid fa-chevron-left"></i> 이전 활동 2로
+          </button>
+          <button onclick="alert('활동지가 완벽히 입력되었습니다! 이제 아래의 공유 또는 인쇄 버튼을 눌러 결과물을 제출해 주세요.')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 shadow-md transition-all">
+            <i class="fa-solid fa-check-double"></i> 학습지 제출 완료
+          </button>
+        </div>
+
+        <!-- 이미지 공유 및 캡처 가이드박스 -->
+        <div class="w-full bg-slate-50 border-2 border-dashed border-teal-300 rounded-2xl p-4 text-center mt-4">
+          <span class="text-xs text-slate-500 font-bold block mb-2">📸 완성된 활동 조사 결과를 사진으로 간편하게 공유하세요!</span>
+          <div class="flex justify-center gap-3">
+            <button onclick="mockSavePhoto()" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-sm">
+              <i class="fa-solid fa-download"></i> 사진 저장
+            </button>
+            <button onclick="mockCopyImage()" class="bg-white border border-teal-500 text-teal-700 hover:bg-teal-50 px-4 py-2 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-sm">
+              <i class="fa-solid fa-copy"></i> 이미지 복사 (클립보드)
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 하단 라이센스/카피라이트 -->
+  <footer class="text-center text-xs text-slate-400 mt-12">
+    <span>💖 데이터로 만나는 반려동물 사회 · 인공지능 융합 학습지 💖</span>
+  </footer>
+
+  <!-- 자바스크립트 비즈니스 로직 -->
+  <script>
+    // 전역 상태 데이터 관리
+    const state = {
+      isTrained: false,
+      c1Data: ['🥩 고기', '🥕 당근', '🍎 사과', '🥬 채소'],
+      c2Data: ['🍫 초콜릿', '🍇 포도', '🧅 양파', '☕ 커피'],
+      currentTestFood: { emoji: '🍎', name: '사과' }
+    };
+
+    // 탭 전환 기능
+    function switchActivity(num) {
+      // 콘텐츠 영역들 모두 감추기
+      document.getElementById('content-act1').classList.add('hidden');
+      document.getElementById('content-act2').classList.add('hidden');
+      document.getElementById('content-act3').classList.add('hidden');
+
+      // 탭 스타일 초기화
+      const tab1 = document.getElementById('tab-act1');
+      const tab2 = document.getElementById('tab-act2');
+      const tab3 = document.getElementById('tab-act3');
+      
+      [tab1, tab2, tab3].forEach(t => {
+        t.className = "bg-white border-2 border-slate-200 text-slate-600 p-4 rounded-2xl shadow-sm hover:shadow-md transition-all flex flex-col items-center justify-center gap-1";
+      });
+
+      // 선택된 활성화 상태 세팅
+      if (num === 1) {
+        document.getElementById('content-act1').classList.remove('hidden');
+        tab1.className = "bg-white border-2 border-teal-400 text-teal-700 p-4 rounded-2xl shadow-sm hover:shadow-md transition-all flex flex-col items-center justify-center gap-1 ring-2 ring-teal-300";
+      } else if (num === 2) {
+        document.getElementById('content-act2').classList.remove('hidden');
+        tab2.className = "bg-white border-2 border-rose-400 text-rose-700 p-4 rounded-2xl shadow-sm hover:shadow-md transition-all flex flex-col items-center justify-center gap-1 ring-2 ring-rose-300";
+        // 텍스트 반영
+        updateLabelTexts();
+      } else if (num === 3) {
+        document.getElementById('content-act3').classList.remove('hidden');
+        tab3.className = "bg-white border-2 border-amber-400 text-amber-700 p-4 rounded-2xl shadow-sm hover:shadow-md transition-all flex flex-col items-center justify-center gap-1 ring-2 ring-amber-300";
+        // 텍스트 반영 및 동물의 아바타 맞춤형 세팅
+        updateLabelTexts();
+        setPetAvatar();
+      }
+    }
+
+    // 클래스 라벨 업데이트 동기화
+    function updateLabelTexts() {
+      const c1 = document.getElementById('class1-name').value || '안전한 먹이';
+      const c2 = document.getElementById('class2-name').value || '위험한 음식';
+
+      document.querySelectorAll('.class1-label').forEach(el => el.innerText = c1);
+      document.querySelectorAll('.class2-label').forEach(el => el.innerText = c2);
+    }
+
+    // 아바타 세팅
+    function setPetAvatar() {
+      const name = document.getElementById('pet-name').value || '';
+      const avatarEl = document.getElementById('sim-pet-avatar');
+      if (name.includes('고양이') || name.includes('캣')) {
+        avatarEl.innerText = '🐱';
+      } else if (name.includes('토끼')) {
+        avatarEl.innerText = '🐰';
+      } else if (name.includes('새') || name.includes('앵무새')) {
+        avatarEl.innerText = '🦜';
+      } else {
+        avatarEl.innerText = '🐶'; // 기본값 강아지
+      }
+    }
+
+    // 데이터 학습 카드 동적 렌더링
+    function renderTrainingGalleries() {
+      const c1Gallery = document.getElementById('c1-gallery');
+      const c2Gallery = document.getElementById('c2-gallery');
+
+      c1Gallery.innerHTML = '';
+      c2Gallery.innerHTML = '';
+
+      state.c1Data.forEach(item => {
+        const div = document.createElement('div');
+        div.className = "aspect-square bg-white border border-slate-200 rounded-lg p-1 relative flex flex-col items-center justify-center";
+        const parts = item.split(' ');
+        const emoji = parts[0] || '🍏';
+        const name = parts[1] || item;
+        div.innerHTML = `<span class="text-xl">${emoji}</span><span class="text-[9px] text-slate-500 font-semibold mt-1">${name}</span>`;
+        c1Gallery.appendChild(div);
+      });
+
+      state.c2Data.forEach(item => {
+        const div = document.createElement('div');
+        div.className = "aspect-square bg-white border border-slate-200 rounded-lg p-1 relative flex flex-col items-center justify-center";
+        const parts = item.split(' ');
+        const emoji = parts[0] || '⚠️';
+        const name = parts[1] || item;
+        div.innerHTML = `<span class="text-xl">${emoji}</span><span class="text-[9px] text-slate-500 font-semibold mt-1">${name}</span>`;
+        c2Gallery.appendChild(div);
+      });
+
+      document.getElementById('c1-count').innerText = state.c1Data.length;
+      document.getElementById('c2-count').innerText = state.c2Data.length;
+    }
+
+    // 학습용 음식 데이터 직접 추가
+    function addTrainingData(classNum) {
+      if (classNum === 1) {
+        const val = document.getElementById('c1-add-input').value.trim();
+        if (!val) return;
+        state.c1Data.push('🥦 ' + val);
+        document.getElementById('c1-add-input').value = '';
+      } else {
+        const val = document.getElementById('c2-add-input').value.trim();
+        if (!val) return;
+        state.c2Data.push('☠️ ' + val);
+        document.getElementById('c2-add-input').value = '';
+      }
+      renderTrainingGalleries();
+      state.isTrained = false; // 학습 데이터가 변경되었으므로 미학습 상태로 복귀
+      document.getElementById('train-status').innerText = '데이터가 추가되어 모델이 변경되었습니다. 다시 학습해 주세요!';
+    }
+
+    // 인공지능 가상 학습 개시 애니메이션
+    function trainModel() {
+      const btn = document.getElementById('btn-train');
+      const progressContainer = document.getElementById('train-progress-container');
+      const progressBar = document.getElementById('train-progress-bar');
+      const status = document.getElementById('train-status');
+
+      btn.disabled = true;
+      progressContainer.classList.remove('hidden');
+      progressBar.style.width = '0%';
+      status.innerText = '학습 데이터 최적화 분석 중...';
+
+      let count = 0;
+      const interval = setInterval(() => {
+        count += 20;
+        progressBar.style.width = count + '%';
+        status.innerText = `에포크(Epoch) 진행율 : ${count / 20}/5 회 학습 중...`;
+
+        if (count >= 100) {
+          clearInterval(interval);
+          status.innerText = '학습 완료! 정확도가 크게 향상되었습니다. 🎉';
+          btn.disabled = false;
+          state.isTrained = true;
+        }
+      }, 400);
+    }
+
+    // 테스트용 임시 사진 지정
+    function selectTestFood(emoji, name) {
+      state.currentTestFood = { emoji, name };
+      document.getElementById('test-food-emoji').innerText = emoji;
+      document.getElementById('test-food-name').innerText = name;
+    }
+
+    // 직접 테스트용 음식 작성 업로드 모의 기능
+    function triggerCustomTest() {
+      const name = prompt('제시할 임의의 테스트 음식 이름을 한글로 적어주세요! (예: 단호박, 도넛 등)');
+      if (name) {
+        selectTestFood('🧩', name);
+      }
+    }
+
+    // 가상 이미지 분석 추론 실행 알고리즘
+    function runClassification() {
+      if (!state.isTrained) {
+        alert('먼저 1단계 "모델 학습 시작하기" 버튼을 눌러 인공지능을 학습시킨 후 시뮬레이션해 주세요!');
+        return;
+      }
+
+      const foodName = state.currentTestFood.name;
+      
+      let c1Percentage = 0;
+      let c2Percentage = 0;
+
+      // 완전 자동 추론 판별 조건 (수집된 데이터셋 기반 우선 검색)
+      const isGoodFood = state.c1Data.some(item => item.includes(foodName)) || ['사과', '소고기', '고기', '당근', '채소', '브로콜리', '배추'].includes(foodName);
+      const isBadFood = state.c2Data.some(item => item.includes(foodName)) || ['초콜릿', '포도', '양파', '커피', '닭뼈', '피자', '콜라'].includes(foodName);
+
+      if (isGoodFood) {
+        c1Percentage = Math.floor(Math.random() * 15) + 85; // 85~99%
+        c2Percentage = 100 - c1Percentage;
+      } else if (isBadFood) {
+        c2Percentage = Math.floor(Math.random() * 15) + 85; // 85~99%
+        c1Percentage = 100 - c2Percentage;
+      } else {
+        // 완전 낯선 단어일 때: 반반 확률의 모호한 분포
+        c1Percentage = Math.floor(Math.random() * 20) + 40; // 40~60%
+        c2Percentage = 100 - c1Percentage;
+      }
+
+      // 게이지 바 그래픽 반영
+      document.getElementById('result-c1-percentage').innerText = c1Percentage + '%';
+      document.getElementById('result-c1-bar').style.width = c1Percentage + '%';
+
+      document.getElementById('result-c2-percentage').innerText = c2Percentage + '%';
+      document.getElementById('result-c2-bar').style.width = c2Percentage + '%';
+    }
+
+    // [활동 3] 에뮬레이터 인터랙티브 양육 피딩
+    let health = 100;
+    function simulateFeeding(resultType) {
+      const bubble = document.getElementById('sim-bubble');
+      const avatar = document.getElementById('sim-pet-avatar');
+      const healthSpan = document.getElementById('sim-health');
+
+      const healVal = parseInt(document.getElementById('block-heal-val').value) || 10;
+      const healMsg = document.getElementById('block-heal-msg').value;
+      const warnMsg = document.getElementById('block-warn-msg').value;
+
+      bubble.classList.remove('hidden');
+
+      if (resultType === 1) {
+        // 유익 음식 피딩 완료
+        health = Math.min(100, health + healVal);
+        bubble.innerText = healMsg;
+        bubble.className = "absolute top-2 right-2 left-2 bg-emerald-100 border border-emerald-300 text-emerald-800 p-2 rounded-lg text-xs font-semibold text-center shadow-sm";
+        avatar.className = "text-6xl animate-bounce mb-2";
+        // 진동 효과음 시뮬레이션 및 복구
+        setTimeout(() => { avatar.className = "text-6xl mb-2"; }, 1000);
+      } else {
+        // 위험 경고 발생
+        health = Math.max(10, health - 25);
+        bubble.innerText = warnMsg;
+        bubble.className = "absolute top-2 right-2 left-2 bg-rose-100 border border-rose-300 text-rose-800 p-2 rounded-lg text-xs font-semibold text-center shadow-sm";
+        avatar.className = "text-6xl animate-ping mb-2 duration-500";
+        // 원래 상태 환원
+        setTimeout(() => { avatar.className = "text-6xl mb-2"; }, 800);
+      }
+
+      healthSpan.innerText = health;
+      if (health < 40) {
+        healthSpan.className = "text-rose-600 font-black animate-pulse";
+      } else {
+        healthSpan.className = "text-emerald-600 font-bold";
+      }
+    }
+
+    // 학습지 전체 초기화 기능
+    function resetActivity() {
+      if (confirm('모든 입력 필드와 AI 가상 학습 결과가 새것으로 초기화됩니다. 정말 그렇게 하시겠습니까?')) {
+        document.getElementById('pet-name').value = '';
+        document.getElementById('pet-feature').value = '';
+        document.getElementById('food-good').value = '';
+        document.getElementById('food-bad').value = '';
+        document.getElementById('class1-name').value = '안전한 먹이';
+        document.getElementById('class2-name').value = '위험한 음식';
+        document.getElementById('finding-1').value = '';
+        document.getElementById('finding-2').value = '';
+        document.getElementById('discussion-text').value = '';
+
+        state.isTrained = false;
+        state.c1Data = ['🥩 고기', '🥕 당근', '🍎 사과', '🥬 채소'];
+        state.c2Data = ['🍫 초콜릿', '🍇 포도', '🧅 양파', '☕ 커피'];
+        state.currentTestFood = { emoji: '🍎', name: '사과' };
+
+        document.getElementById('train-progress-container').classList.add('hidden');
+        document.getElementById('train-status').innerText = '대기 중...';
+        
+        document.getElementById('result-c1-percentage').innerText = '0%';
+        document.getElementById('result-c1-bar').style.width = '0%';
+        document.getElementById('result-c2-percentage').innerText = '0%';
+        document.getElementById('result-c2-bar').style.width = '0%';
+
+        health = 100;
+        document.getElementById('sim-health').innerText = '100';
+        document.getElementById('sim-health').className = "text-emerald-600 font-bold";
+        document.getElementById('sim-bubble').classList.add('hidden');
+
+        renderTrainingGalleries();
+        switchActivity(1);
+        alert('모든 내역이 깨끗하게 정리되었습니다.');
+      }
+    }
+
+    // 캡처 이미지 저장 시뮬레이션
+    function mockSavePhoto() {
+      alert("✨ 이미지 파일로 성공적으로 저장되었습니다! [반려동물_AI_학습지_결과.png]");
+    }
+
+    // 이미지 임시 복사 시뮬레이션
+    function mockCopyImage() {
+      // 윈도우 iFrame 우회 클립보드 기능 대응
+      const tempInput = document.createElement('input');
+      tempInput.value = window.location.href;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempInput);
+      alert("📋 활동 결과 화면 이미지가 클립보드에 무사히 복사되었습니다! 원하는 공유 플랫폼에 붙여넣기(Ctrl+V) 하세요.");
+    }
+
+    // 윈도우 로드 시 즉시 데이터 정비
+    window.onload = function() {
+      renderTrainingGalleries();
+    };
+  </script>
+</body>
+</html>
