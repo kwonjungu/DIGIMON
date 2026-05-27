@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3~4차시 · 나만의 반려동물 만들기</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Noto Sans KR & Jua) -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Jua&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f0f9f6; /* 파스텔 민트 백그라운드 */
+        }
+        .jua-font {
+            font-family: 'Jua', sans-serif;
+        }
+        /* 커스텀 스크롤바 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e6f4f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        /* 부드러운 라운드 카드 디자인 */
+        .digimon-card {
+            border-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(20, 184, 166, 0.08), 0 8px 10px -6px rgba(20, 184, 166, 0.04);
+        }
+        /* 탭 선택 강조 경계선 */
+        .tab-active-1 { border-color: #14b8a6; color: #0d9488; }
+        .tab-active-2 { border-color: #f43f5e; color: #e11d48; }
+        .tab-active-3 { border-color: #eab308; color: #ca8a04; }
+        .stamp-glow {
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.5);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        /* 엔트리 블록 모양 스타일링 */
+        .entry-block {
+            border-radius: 6px 16px 16px 6px;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-weight: 700;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 14px;
+            color: white;
+            box-shadow: 2px 2px 4px rgba(0,0,0,0.08);
+            margin: 2px 0;
+        }
+        .entry-start { background-color: #00b061; } /* 시작 블록 */
+        .entry-flow { background-color: #ff9d00; } /* 흐름 블록 */
+        .entry-ai { background-color: #8c5af5; } /* AI/비디오 감지 블록 */
+        .entry-move { background-color: #00c4c4; } /* 이동/제어 블록 */
+        @media print {
+            body { background: white !important; }
+            .no-print { display: none !important; }
+            .tab-content { display: block !important; }
+            .tab-content + .tab-content { page-break-before: always; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col pb-12">
+
+    <!-- 상단 네비게이션 (프로젝트 공통 스타일) -->
+    <nav class="max-w-5xl w-full mx-auto px-4 pt-6 flex flex-col gap-3 no-print">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <a href="../" class="inline-flex items-center gap-2 bg-white px-5 py-2.5 rounded-full shadow-md text-teal-600 font-bold hover:bg-teal-50 transition text-base">
+                <i class="fa-solid fa-arrow-left"></i> 메인으로
+            </a>
+            <div class="flex gap-1.5 flex-wrap">
+                <a href="../1-2/" class="text-xs font-bold px-3 py-1.5 rounded-full bg-teal-100 text-teal-700 hover:bg-teal-200 transition">1~2차시</a>
+                <span class="text-xs font-bold px-3 py-1.5 rounded-full bg-teal-500 text-white shadow-sm">3~4차시</span>
+                <a href="../5-6/" class="text-xs font-bold px-3 py-1.5 rounded-full bg-orange-100 text-orange-700 hover:bg-orange-200 transition">5~6차시</a>
+                <a href="../7-8/" class="text-xs font-bold px-3 py-1.5 rounded-full bg-blue-100 text-blue-700 hover:bg-blue-200 transition">7~8차시</a>
+                <button onclick="alert('준비 중인 차시입니다.')" class="text-xs font-bold px-3 py-1.5 rounded-full bg-pink-100 text-pink-700 hover:bg-pink-200 transition">9차시</button>
+            </div>
+        </div>
+        <div class="flex justify-center gap-2 mt-1">
+            <button onclick="window.print()" class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-bold px-4 py-2 rounded-full shadow-sm flex items-center gap-1.5 transition-all">
+                <i class="fa-solid fa-print text-purple-500"></i>
+                <span>인쇄하기</span>
+            </button>
+            <button onclick="resetActivitySheet()" class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-bold px-4 py-2 rounded-full shadow-sm flex items-center gap-1.5 transition-all">
+                <i class="fa-solid fa-rotate-right text-rose-500"></i>
+                <span>초기화</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- MAIN TITLE ZONE -->
+    <header class="max-w-4xl mx-auto w-full px-4 text-center mt-6 mb-4">
+        <div class="inline-flex items-center gap-1.5 bg-teal-50 border border-teal-200 text-teal-700 text-xs font-bold px-4 py-1.5 rounded-full mb-3 shadow-inner">
+            <span>3~4차시 · 나만의 반려동물 만들기</span>
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-teal-900 tracking-tight flex items-center justify-center gap-2 jua-font">
+            <span class="text-teal-600">🐾</span> 나만의 반려동물 만들기
+        </h1>
+        <p class="text-slate-500 text-xs sm:text-sm mt-2 leading-relaxed max-w-xl mx-auto">
+            생성형 인공지능과 검색 데이터를 통해 정확한 정보를 구별하는 힘을 기르고,<br>
+            직접 프롬프트를 설계해 짝꿍과 소통하며 엔트리 비디오 감지로 내 손을 따라 움직이는 코딩 활동을 완수해 봐요.
+        </p>
+    </header>
+
+    <!-- 배움 도장판 (Stamp Plate) -->
+    <section class="max-w-4xl mx-auto w-full px-4 mb-4">
+        <div class="bg-white/90 border-2 border-dashed border-teal-200 rounded-3xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+            <div class="flex items-center gap-2.5">
+                <div class="w-10 h-10 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center text-lg shadow-inner">
+                    <i class="fa-solid fa-stamp"></i>
+                </div>
+                <div>
+                    <h4 class="font-extrabold text-slate-800 text-xs sm:text-sm">참된 배움 도장판</h4>
+                    <p class="text-[10px] text-slate-400">각 활동을 마칠 때마다 하단의 도장받기 버튼을 눌러 채워보세요!</p>
+                </div>
+            </div>
+            <!-- Stamps Grid -->
+            <div class="flex gap-4">
+                <div id="stamp-act1" class="w-12 h-12 rounded-full border-2 border-dashed border-slate-300 bg-slate-50 flex flex-col items-center justify-center text-[10px] font-bold text-slate-400 transition-all">
+                    <span>활동 1</span>
+                    <span class="text-[8px] font-black">비판적사고</span>
+                </div>
+                <div id="stamp-act2" class="w-12 h-12 rounded-full border-2 border-dashed border-slate-300 bg-slate-50 flex flex-col items-center justify-center text-[10px] font-bold text-slate-400 transition-all">
+                    <span>활동 2</span>
+                    <span class="text-[8px] font-black">주체성</span>
+                </div>
+                <div id="stamp-act3" class="w-12 h-12 rounded-full border-2 border-dashed border-slate-300 bg-slate-50 flex flex-col items-center justify-center text-[10px] font-bold text-slate-400 transition-all">
+                    <span>활동 3</span>
+                    <span class="text-[8px] font-black">창의적사고</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- THREE BIG ACTIVITY TAB CARDS -->
+    <section class="max-w-4xl mx-auto w-full px-4 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Activity 1 Tab -->
+            <button onclick="switchTab('act1')" id="tab-card-act1" class="bg-white border-2 border-slate-100 hover:border-teal-200 p-4 rounded-[22px] shadow-sm flex flex-col items-center text-center gap-1.5 transition-all group">
+                <div class="w-9 h-9 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center text-md shadow-inner group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+                <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">활동 1</span>
+                <span class="font-extrabold text-slate-800 text-xs sm:text-sm group-hover:text-teal-700 transition-colors">반려동물 척척박사</span>
+            </button>
+
+            <!-- Activity 2 Tab -->
+            <button onclick="switchTab('act2')" id="tab-card-act2" class="bg-white border-2 border-slate-100 hover:border-rose-200 p-4 rounded-[22px] shadow-sm flex flex-col items-center text-center gap-1.5 transition-all group">
+                <div class="w-9 h-9 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center text-md shadow-inner group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-user-group"></i>
+                </div>
+                <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">활동 2</span>
+                <span class="font-extrabold text-slate-800 text-xs sm:text-sm group-hover:text-rose-600 transition-colors">프롬프트와 친해지기</span>
+            </button>
+
+            <!-- Activity 3 Tab -->
+            <button onclick="switchTab('act3')" id="tab-card-act3" class="bg-white border-2 border-slate-100 hover:border-yellow-200 p-4 rounded-[22px] shadow-sm flex flex-col items-center text-center gap-1.5 transition-all group">
+                <div class="w-9 h-9 rounded-full bg-yellow-50 text-yellow-500 flex items-center justify-center text-md shadow-inner group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-gamepad"></i>
+                </div>
+                <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">활동 3</span>
+                <span class="font-extrabold text-slate-800 text-xs sm:text-sm group-hover:text-yellow-600 transition-colors">엔트리 비디오 감지 반려동물</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- ACTIVITY 1: 반려동물 척척박사가 되었어요 -->
+    <!-- ========================================== -->
+    <section id="tab-content-act1" class="tab-content max-w-4xl mx-auto w-full px-4 block">
+        <div class="bg-white rounded-[32px] p-6 sm:p-8 shadow-sm border border-slate-100 space-y-6">
+            <!-- Header title -->
+            <div class="border-b border-slate-100 pb-4">
+                <h3 class="text-xl font-extrabold text-teal-900 flex items-center gap-2 jua-font">
+                    🔍 활동 1. 반려동물 척척박사가 되었어요
+                </h3>
+                <p class="text-xs sm:text-sm text-slate-500 mt-1">
+                    인공지능이 생성한 그럴듯하지만 '틀린 오염 정보(할루시네이션)'가 가끔 숨겨져 있습니다. 태블릿 PC 검색으로 교차 검증을 해서 진짜와 가짜를 구별해 보세요!
+                </p>
+            </div>
+
+            <!-- Dynamic Random Quiz Card Area -->
+            <div id="quiz-container" class="bg-teal-50/40 border border-teal-100/70 rounded-2xl p-6 space-y-5">
+                <div class="flex items-center justify-between">
+                    <span id="quiz-number-badge" class="bg-teal-100 text-teal-800 text-xs font-black px-3 py-1 rounded-full">AI 주장 1</span>
+                    <span id="quiz-keyword-badge" class="text-xs text-slate-400 font-bold">키워드: 로딩 중...</span>
+                </div>
+
+                <blockquote id="quiz-statement" class="text-slate-700 font-semibold text-sm sm:text-base border-l-4 border-teal-500 pl-4 py-1.5 leading-relaxed min-h-[60px]">
+                    질문을 소환하는 중입니다...
+                </blockquote>
+
+                <div class="text-xs text-slate-400 flex items-center gap-1.5">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <span>추천 팩트체크 검색어: <strong id="quiz-search-helper" class="text-teal-600">로딩 중...</strong></span>
+                </div>
+
+                <!-- Choose buttons -->
+                <div class="grid grid-cols-2 gap-4 pt-2">
+                    <button onclick="submitQuizAnswer(true)" id="btn-quiz-true" class="bg-white border border-slate-200 hover:border-emerald-300 rounded-2xl p-4 text-center transition-all shadow-sm">
+                        <span class="text-4xl block">🙆‍♂️</span>
+                        <span class="block text-xs font-bold text-emerald-600 mt-2">진실 (True)</span>
+                    </button>
+                    <button onclick="submitQuizAnswer(false)" id="btn-quiz-false" class="bg-white border border-slate-200 hover:border-rose-300 rounded-2xl p-4 text-center transition-all shadow-sm">
+                        <span class="text-4xl block">🙅‍♀️</span>
+                        <span class="block text-xs font-bold text-rose-600 mt-2">거짓 (False)</span>
+                    </button>
+                </div>
+
+                <!-- Explanation / Result Box -->
+                <div id="quiz-result-feedback" class="hidden bg-white border rounded-2xl p-5 text-xs sm:text-sm text-slate-600 shadow-inner space-y-2">
+                    <div id="feedback-title" class="font-black flex items-center gap-1.5"></div>
+                    <p id="feedback-text" class="leading-relaxed"></p>
+                </div>
+            </div>
+
+            <!-- Validation Actions -->
+            <div class="pt-6 border-t border-slate-100 flex flex-col sm:flex-row justify-end items-center gap-4">
+                <div class="flex gap-2 w-full sm:w-auto">
+                    <button onclick="pickRandomQuiz()" class="flex-1 sm:flex-none bg-teal-50 border border-teal-200 hover:bg-teal-100 text-teal-700 font-bold px-5 py-3 rounded-2xl transition-all text-sm flex items-center justify-center gap-2 shadow-sm">
+                        <i class="fa-solid fa-rotate"></i>
+                        <span>다른 문제 도전하기</span>
+                    </button>
+                    <button onclick="validateActivity1()" class="flex-1 sm:flex-none bg-teal-600 hover:bg-teal-700 text-white font-extrabold px-6 py-3 rounded-2xl shadow-sm transition-all flex items-center justify-center gap-2 text-sm">
+                        <span>활동 1 완료 도장 받기</span>
+                        <i class="fa-solid fa-stamp"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- ACTIVITY 2: 프롬프트와 친해지고 체험해봐요 -->
+    <!-- ========================================== -->
+    <section id="tab-content-act2" class="tab-content max-w-4xl mx-auto w-full px-4 hidden">
+        <div class="bg-white rounded-[32px] p-6 sm:p-8 shadow-sm border border-slate-100 space-y-6">
+            <!-- Header Title -->
+            <div class="border-b border-slate-100 pb-4">
+                <h3 class="text-xl font-extrabold text-rose-900 flex items-center gap-2 jua-font">
+                    ⚡ 활동 2. 프롬프트와 친해지고 체험해봐요
+                </h3>
+                <p id="act2-subdesc" class="text-xs sm:text-sm text-slate-500 mt-1">
+                    버튼 클릭을 통해 반려동물을 생성해보고, 프롬프트 작성방법을 배워봐요
+                </p>
+            </div>
+
+            <!-- 1단계: 클릭으로 만드는 반려동물 (Full-Width) -->
+            <div class="bg-rose-50/30 border border-rose-100/70 rounded-[24px] p-6 space-y-4 w-full">
+                <div class="flex items-center justify-between border-b border-rose-100 pb-3">
+                    <span class="font-extrabold text-slate-800 text-sm sm:text-base flex items-center gap-1.5">
+                        <i class="fa-solid fa-ban text-rose-500"></i> 1단계: 클릭으로 만드는 반려동물
+                    </span>
+                    <span class="text-[10px] bg-rose-100 text-rose-800 font-extrabold px-3 py-1 rounded-full">인공지능의 결정권</span>
+                </div>
+                <p class="text-xs sm:text-sm text-slate-500 leading-relaxed">
+                    💡 버튼을 클릭하여 다양한 반려동물을 생성해보세요.
+                </p>
+
+                <!-- Grid inside Full Width container -->
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                    <!-- Options Group (Left 7 Columns) -->
+                    <div class="md:col-span-7 space-y-4 bg-white/70 p-4 rounded-2xl border border-slate-100 shadow-inner">
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">동물 (고정)</label>
+                            <div class="grid grid-cols-5 gap-2">
+                                <button onclick="setRiggedOption('animal', '강아지')" id="rig-animal-dog" class="py-2 bg-white border border-slate-200 text-xs font-bold rounded-xl hover:bg-slate-50 transition-colors">강아지</button>
+                                <button onclick="setRiggedOption('animal', '토끼')" id="rig-animal-rabbit" class="py-2 bg-white border border-slate-200 text-xs font-bold rounded-xl hover:bg-slate-50 transition-colors">토끼</button>
+                                <button onclick="setRiggedOption('animal', '도마뱀')" id="rig-animal-lizard" class="py-2 bg-white border border-slate-200 text-xs font-bold rounded-xl hover:bg-slate-50 transition-colors">도마뱀</button>
+                                <button onclick="setRiggedOption('animal', '고양이')" id="rig-animal-cat" class="py-2 bg-white border border-slate-200 text-xs font-bold rounded-xl hover:bg-slate-50 transition-colors">고양이</button>
+                                <button onclick="setRiggedOption('animal', '햄스터')" id="rig-animal-hamster" class="py-2 bg-white border border-slate-200 text-xs font-bold rounded-xl hover:bg-slate-50 transition-colors">햄스터</button>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">색깔 (고정)</label>
+                            <div class="grid grid-cols-5 gap-2">
+                                <button onclick="setRiggedOption('color', '분홍색')" id="rig-color-pink" class="py-2 bg-white border border-slate-200 text-xs font-bold rounded-xl hover:bg-slate-50 transition-colors">분홍색</button>
+                                <button onclick="setRiggedOption('color', '초록색')" id="rig-color-green" class="py-2 bg-white border border-slate-200 text-xs font-bold rounded-xl hover:bg-slate-50 transition-colors">초록색</button>
+                                <button onclick="setRiggedOption('color', '노란색')" id="rig-color-yellow" class="py-2 bg-white border border-slate-200 text-xs font-bold rounded-xl hover:bg-slate-50 transition-colors">노란색</button>
+                                <button onclick="setRiggedOption('color', '파란색')" id="rig-color-blue" class="py-2 bg-white border border-slate-200 text-xs font-bold rounded-xl hover:bg-slate-50 transition-colors">파란색</button>
+                                <button onclick="setRiggedOption('color', '보라색')" id="rig-color-purple" class="py-2 bg-white border border-slate-200 text-xs font-bold rounded-xl hover:bg-slate-50 transition-colors">보라색</button>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">액세서리 (고정)</label>
+                            <div class="grid grid-cols-4 gap-2">
+                                <button onclick="setRiggedOption('accessory', '리본')" id="rig-acc-ribbon" class="py-2 bg-white border border-slate-200 text-xs font-bold rounded-xl hover:bg-slate-50 transition-colors">리본</button>
+                                <button onclick="setRiggedOption('accessory', '안경')" id="rig-acc-glasses" class="py-2 bg-white border border-slate-200 text-xs font-bold rounded-xl hover:bg-slate-50 transition-colors">안경</button>
+                                <button onclick="setRiggedOption('accessory', '모자')" id="rig-acc-hat" class="py-2 bg-white border border-slate-200 text-xs font-bold rounded-xl hover:bg-slate-50 transition-colors">모자</button>
+                                <button onclick="setRiggedOption('accessory', '스카프')" id="rig-acc-scarf" class="py-2 bg-white border border-slate-200 text-xs font-bold rounded-xl hover:bg-slate-50 transition-colors">스카프</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Viewport & Action (Right 5 Columns) -->
+                    <div class="md:col-span-5 flex flex-col gap-3">
+                        <div class="border border-rose-100 rounded-2xl bg-white h-44 flex flex-col items-center justify-center p-3 relative overflow-hidden shadow-inner">
+                            <div id="rigged-loading" class="hidden absolute inset-0 bg-white/95 flex flex-col items-center justify-center z-10">
+                                <i class="fa-solid fa-spinner animate-spin text-rose-500 text-2xl mb-1.5"></i>
+                                <span class="text-[10px] text-slate-400 font-extrabold">반려동물 합성 중...</span>
+                            </div>
+                            <div id="rigged-placeholder" class="text-center">
+                                <i class="fa-solid fa-circle-nodes text-slate-300 text-3xl mb-1.5 animate-pulse"></i>
+                                <p class="text-[10px] text-slate-400 font-bold">옵션 버튼을 선택한 다음 그림을 소환해봐요</p>
+                            </div>
+                            <img id="rigged-img-result" class="hidden w-full h-full object-contain rounded-xl" src="" alt="합성 결과">
+                        </div>
+
+                        <button onclick="generateRiggedNano()" class="w-full bg-rose-500 hover:bg-rose-600 text-white font-extrabold py-3 rounded-xl text-xs sm:text-sm transition-colors shadow-sm flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            <span>반려동물 만들기</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2단계: 프롬프트 공부방 -->
+            <div class="bg-teal-50/50 border border-teal-100 rounded-[24px] p-6 space-y-4">
+                <h4 class="font-extrabold text-teal-900 text-base flex items-center gap-1.5 border-b border-teal-100 pb-2">
+                    <i class="fa-solid fa-graduation-cap text-teal-600"></i>
+                    <span>2단계: 프롬프트를 왜 공부해야 하며, 어떻게 잘 쓸까요?</span>
+                </h4>
+                <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    버튼만 클릭하는 생성기는 나의 세밀한 기획을 표현해낼 수 없습니다. 아래의 세련된 <strong>좋은 프롬프트 작성 3요소</strong>를 터득하여, 나만의 머릿속 반려동물을 정확하게 묘사해 보세요!
+                </p>
+
+                <!-- 3가지 프롬프트 작성 방법 카드 -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                    <!-- Card 1 -->
+                    <div class="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm hover:border-teal-300 transition-colors flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="text-xl bg-teal-50 p-1.5 rounded-lg text-teal-600"><i class="fa-solid fa-pen-fancy"></i></span>
+                                <h5 class="font-black text-slate-800 text-xs sm:text-sm">1) 구체적이고 명확하게 말하기</h5>
+                            </div>
+                            <p class="text-[11px] text-slate-500 leading-relaxed">
+                                동물의 크기, 색깔, 질감을 생생하게 묘사하여 대상을 구체화합니다.
+                            </p>
+                        </div>
+                        <div class="mt-3 pt-2 border-t border-slate-100">
+                            <span class="text-[10px] text-teal-600 font-bold block">(예: 하얗고 복슬복슬한 털을 가진 동그란 아기 토끼)</span>
+                        </div>
+                    </div>
+                    <!-- Card 2 -->
+                    <div class="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm hover:border-teal-300 transition-colors flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="text-xl bg-teal-50 p-1.5 rounded-lg text-teal-600"><i class="fa-solid fa-shield-halved"></i></span>
+                                <h5 class="font-black text-slate-800 text-xs sm:text-sm">2) 지켜야 할 조건 작성하기</h5>
+                            </div>
+                            <p class="text-[11px] text-slate-500 leading-relaxed">
+                                제외할 요소나 주변 풍경, 수량 조건 등의 확실한 경계를 정해줍니다.
+                            </p>
+                        </div>
+                        <div class="mt-3 pt-2 border-t border-slate-100">
+                            <span class="text-[10px] text-teal-600 font-bold block">(예: 복잡한 무늬 없이, 단순하고 깔끔한 흰색 배경 한가운데)</span>
+                        </div>
+                    </div>
+                    <!-- Card 3 -->
+                    <div class="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm hover:border-teal-300 transition-colors flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="text-xl bg-teal-50 p-1.5 rounded-lg text-teal-600"><i class="fa-solid fa-palette"></i></span>
+                                <h5 class="font-black text-slate-800 text-xs sm:text-sm">3) 예시를 함께 알려주기</h5>
+                            </div>
+                            <p class="text-[11px] text-slate-500 leading-relaxed">
+                                원하는 분위기, 그림 형태를 참고할 수 있는 힌트 스타일을 명시합니다.
+                            </p>
+                        </div>
+                        <div class="mt-3 pt-2 border-t border-slate-100">
+                            <span class="text-[10px] text-teal-600 font-bold block">(예: 동화책 수채화 삽화 스타일, 3D 점토 장난감 미니어처 느낌)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3단계: 내가 생각하는 반려동물 프롬프트 작성 & 짝꿍 드로잉 활동 -->
+            <div class="bg-yellow-50/30 border border-yellow-100 rounded-[24px] p-6 space-y-4 shadow-sm">
+                <h4 class="font-extrabold text-slate-800 text-sm sm:text-base flex items-center justify-between border-b border-yellow-100 pb-3">
+                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-user-group text-yellow-600"></i> 3단계: 짝꿍과 함께하는 프롬프트 상상 드로잉</span>
+                    <span class="text-[9px] bg-yellow-100 text-yellow-800 font-extrabold px-3 py-1 rounded-full">협동 소통 활동</span>
+                </h4>
+                <p class="text-xs text-slate-500 leading-relaxed">
+                    <strong>활동 방법:</strong> <br>
+                    1. <strong>[학생 A]</strong>가 아래 텍스트 상자에 자신이 생각하는 '구체적인 반려동물 프롬프트(동물 종류, 색깔, 장식, 스타일)'를 자세히 적습니다. <br>
+                    2. <strong>[학생 B(옆 짝꿍)]</strong>는 오직 이 프롬프트 글만 보거나 짝꿍의 목소리를 듣고, 아래 넓어진 스케치북 도화지에 상상하는 그림을 직접 마우스나 터치로 정성스레 그려 맞춰봅니다!
+                </p>
+
+                <div class="space-y-6">
+                    <!-- Prompt Text Area (A) - Expanded & Full Width -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-3 w-full">
+                        <div class="space-y-2">
+                            <label class="block text-xs font-extrabold text-slate-400 uppercase tracking-wider">[학생 A] 상상 반려동물 프롬프트 쓰기</label>
+                            <textarea id="prompt-creator-input" rows="3" placeholder="예: 빨간색 목도리를 두르고 노란색 장난감 공을 가지고 놀고 있는 갈색 아기 강아지" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all placeholder-slate-400 font-semibold"></textarea>
+                        </div>
+                        <div class="p-3 bg-rose-50 rounded-xl text-[10px] text-rose-700 leading-relaxed font-semibold">
+                            ⚠️ <strong>짝꿍을 위한 팁:</strong> 3요소(대상, 제약 조건, 스타일 예시)를 구체적으로 선언할수록 짝꿍이 원래 의도와 똑같은 명화를 그리기 쉽습니다!
+                        </div>
+                    </div>
+
+                    <!-- Sketchpad Canvas (B) - Positioned below and maximized -->
+                    <div class="flex flex-col bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4 w-full">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">[학생 B (짝꿍)] 상상 드로잉 스케치북</span>
+                            <div class="flex items-center gap-1.5">
+                                <button onclick="clearSketchpad()" class="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1.5 rounded-lg border border-slate-200 font-bold transition-all">스케치북 새로 갈기 🔄</button>
+                            </div>
+                        </div>
+
+                        <!-- Real Paint Canvas - Generously enlarged to height 320px (h-80) -->
+                        <div class="relative w-full h-80 bg-slate-50 border-2 border-slate-200 rounded-2xl overflow-hidden shadow-inner">
+                            <canvas id="sketchpad" class="w-full h-full block cursor-crosshair"></canvas>
+                        </div>
+
+                        <!-- Canvas Pen Controller - Diversified with 11 cute artistic color selections -->
+                        <div class="flex items-center justify-between flex-wrap gap-4 pt-1">
+                            <!-- Color palette with expanded collection of pastel/vibrant colors -->
+                            <div class="flex flex-wrap gap-1.5 items-center">
+                                <span class="text-[10px] font-bold text-slate-400 mr-1">색연필 선택:</span>
+                                <button onclick="setPenColor('#1e293b')" class="w-6 h-6 rounded-full bg-slate-800 border-2 border-slate-300 hover:scale-110 transition-transform" title="연필색"></button>
+                                <button onclick="setPenColor('#ef4444')" class="w-6 h-6 rounded-full bg-red-500 hover:scale-110 transition-transform" title="빨강"></button>
+                                <button onclick="setPenColor('#f97316')" class="w-6 h-6 rounded-full bg-orange-500 hover:scale-110 transition-transform" title="주황"></button>
+                                <button onclick="setPenColor('#f59e0b')" class="w-6 h-6 rounded-full bg-amber-500 hover:scale-110 transition-transform" title="노랑"></button>
+                                <button onclick="setPenColor('#10b981')" class="w-6 h-6 rounded-full bg-emerald-500 hover:scale-110 transition-transform" title="초록"></button>
+                                <button onclick="setPenColor('#06b6d4')" class="w-6 h-6 rounded-full bg-cyan-500 hover:scale-110 transition-transform" title="민트하늘"></button>
+                                <button onclick="setPenColor('#3b82f6')" class="w-6 h-6 rounded-full bg-blue-500 hover:scale-110 transition-transform" title="파랑"></button>
+                                <button onclick="setPenColor('#8b5cf6')" class="w-6 h-6 rounded-full bg-violet-500 hover:scale-110 transition-transform" title="보라"></button>
+                                <button onclick="setPenColor('#ec4899')" class="w-6 h-6 rounded-full bg-pink-500 hover:scale-110 transition-transform" title="분홍"></button>
+                                <button onclick="setPenColor('#78350f')" class="w-6 h-6 rounded-full bg-amber-900 hover:scale-110 transition-transform" title="갈색"></button>
+                                <button onclick="setPenColor('#f8fafc')" class="w-6 h-6 rounded-full bg-slate-100 border border-slate-300 hover:scale-110 transition-transform" title="하양"></button>
+                                <div class="h-6 w-px bg-slate-200 mx-1"></div>
+                                <button onclick="useEraser()" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-[10px] font-bold text-slate-600 border border-slate-200 flex items-center gap-1">
+                                    <i class="fa-solid fa-eraser"></i><span>지우개</span>
+                                </button>
+                            </div>
+
+                            <!-- Brush Size -->
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] font-bold text-slate-400">연필 두께:</span>
+                                <input type="range" id="brush-size" min="2" max="25" value="5" onchange="setBrushSize(this.value)" class="w-24 accent-yellow-500">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity progress confirmation -->
+            <div class="pt-6 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <span id="act2-status-text" class="text-xs sm:text-sm font-bold text-slate-500 flex items-center gap-1.5">
+                    <i class="fa-solid fa-puzzle-piece text-rose-500"></i>
+                    <span>훈련 상태: 짝꿍과 프롬프트 드로잉 활동 미완료</span>
+                </span>
+                <button onclick="validateActivity2()" class="w-full sm:w-auto bg-rose-500 hover:bg-rose-600 text-white font-extrabold px-6 py-3 rounded-2xl shadow-sm transition-all flex items-center justify-center gap-2 text-sm">
+                    <span>활동 2 완료 도장 받기</span>
+                    <i class="fa-solid fa-stamp"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- ACTIVITY 3: 엔트리 비디오 감지 반려동물 -->
+    <!-- ========================================== -->
+    <section id="tab-content-act3" class="tab-content max-w-4xl mx-auto w-full px-4 hidden">
+        <div class="bg-white rounded-[32px] p-6 sm:p-8 shadow-sm border border-slate-100 space-y-6">
+            <!-- Header Title -->
+            <div class="border-b border-slate-100 pb-4">
+                <h3 class="text-xl font-extrabold text-yellow-900 flex items-center gap-2 jua-font">
+                    🎨 활동 3. 엔트리 비디오 감지 반려동물
+                </h3>
+                <p class="text-xs sm:text-sm text-slate-500 mt-1">
+                    인공지능의 비디오 감지 기술을 활용하여 내가 생각한 반려동물 오브젝트가 내 손의 움직임을 졸졸 따라오도록 코딩해 봅시다!
+                </p>
+            </div>
+
+            <!-- Designing Companion Pet Card Creator -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+                <!-- Left Control: Step-by-Step Coding Guide in Entry -->
+                <div class="lg:col-span-6 bg-yellow-50/20 border border-yellow-100 rounded-2xl p-5 flex flex-col justify-between space-y-4">
+                    <div class="space-y-4">
+                        <h4 class="font-extrabold text-slate-800 text-sm border-b border-slate-200 pb-2.5 flex items-center gap-1.5">
+                            <i class="fa-solid fa-code text-yellow-600"></i>
+                            <span>엔트리 비디오 감지 코딩 순서</span>
+                        </h4>
+
+                        <!-- Entry Guide List -->
+                        <ul class="space-y-3.5 text-xs text-slate-600 leading-relaxed">
+                            <li class="flex items-start gap-2">
+                                <span class="bg-yellow-500 text-white font-black rounded-full w-4 h-4 flex items-center justify-center text-[10px] mt-0.5 shrink-0">1</span>
+                                <div>
+                                    <strong>엔트리(Entry) 접속하기:</strong> <br>
+                                    <a href="https://playentry.org" target="_blank" class="text-teal-600 font-extrabold underline flex items-center gap-1 mt-0.5">
+                                        <span>playentry.org 바로가기</span> <i class="fa-solid fa-external-link text-[10px]"></i>
+                                    </a>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="bg-yellow-500 text-white font-black rounded-full w-4 h-4 flex items-center justify-center text-[10px] mt-0.5 shrink-0">2</span>
+                                <div>
+                                    <strong>나만의 반려동물 오브젝트 추가:</strong> <br>
+                                    기존 엔트리봇을 삭제하고, 내가 기르고 싶은 귀여운 강아지, 고양이, 도마뱀 등의 새로운 동물 오브젝트를 등록합니다.
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="bg-yellow-500 text-white font-black rounded-full w-4 h-4 flex items-center justify-center text-[10px] mt-0.5 shrink-0">3</span>
+                                <div>
+                                    <strong>비디오 감지 블록 불러오기:</strong> <br>
+                                    왼쪽 아래 <strong>[인공지능] ➡️ [AI 블록 불러오기] ➡️ [비디오 감지]</strong>를 선택해 카메라와 신체 인식 블록을 불러옵니다.
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="bg-yellow-500 text-white font-black rounded-full w-4 h-4 flex items-center justify-center text-[10px] mt-0.5 shrink-0">4</span>
+                                <div>
+                                    <strong>블록 조립하기:</strong> <br>
+                                    오른쪽 가이드를 보고, 손이 카메라에 들어왔을 때 동물 오브젝트가 내 손 위치로 계속 이동하도록 블록을 조립합니다.
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Sandbox Checklist -->
+                    <div class="bg-white/80 border border-slate-200 rounded-xl p-4 space-y-2.5">
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">코딩 완성 체크리스트</span>
+                        <div class="space-y-1.5 text-xs text-slate-700 font-semibold">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" id="chk-step1" class="rounded text-teal-600 focus:ring-teal-500 w-4 h-4">
+                                <span>1. 원하는 반려동물 오브젝트를 골랐나요?</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" id="chk-step2" class="rounded text-teal-600 focus:ring-teal-500 w-4 h-4">
+                                <span>2. 카메라 비디오 화면이 엔트리에 잘 나오나요?</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" id="chk-step3" class="rounded text-teal-600 focus:ring-teal-500 w-4 h-4">
+                                <span>3. 손을 움직일 때 동물이 쫓아오나요?</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Live Preview Card Box (Entry Block Visual Simulator) -->
+                <div class="lg:col-span-6 bg-slate-900 text-white rounded-2xl p-5 flex flex-col justify-between shadow-lg relative min-h-[400px]">
+                    <div class="space-y-4">
+                        <!-- Header -->
+                        <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                            <h4 class="font-bold text-xs sm:text-sm flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                                <span>엔트리 인공지능 블록 설계 도면</span>
+                            </h4>
+                            <span id="pet-card-status" class="text-[9px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full font-bold">도면 확인</span>
+                        </div>
+
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            💡 아래 블록 조립 예시를 참고하여 엔트리 화면에 완벽한 코딩을 짜보세요!
+                        </p>
+
+                        <!-- Simulated Entry Blocks -->
+                        <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 space-y-2 select-none overflow-x-auto">
+                            <!-- Block 1: Start -->
+                            <div class="entry-block entry-start">
+                                <i class="fa-solid fa-play mr-2"></i> 시작하기 버튼을 클릭했을 때
+                            </div>
+
+                            <!-- Block 2: AI Video Start -->
+                            <div class="ml-4 entry-block entry-ai">
+                                <i class="fa-solid fa-video mr-2"></i> [비디오] 화면 보이기
+                            </div>
+
+                            <!-- Block 3: AI Video Transparency -->
+                            <div class="ml-4 entry-block entry-ai">
+                                <i class="fa-solid fa-eye-slash mr-2"></i> [비디오] 투명도를 (50)으로 정하기
+                            </div>
+
+                            <!-- Block 4: Repeat -->
+                            <div class="ml-4 p-3 bg-amber-500/15 border-l-4 border-amber-500 rounded-r-xl space-y-2">
+                                <div class="entry-block entry-flow">
+                                    <i class="fa-solid fa-arrows-spin mr-2"></i> 계속 반복하기
+                                </div>
+
+                                <!-- Nested Block 5: AI detect finger -->
+                                <div class="ml-6 entry-block entry-move">
+                                    <i class="fa-solid fa-paw mr-2"></i> 자신의 위치를 [사람의 오른쪽 검지 손가락] 위치로 이동하기
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submission Area -->
+                        <div class="space-y-2 pt-3 border-t border-slate-800">
+                            <label class="block text-xs font-bold text-slate-400">내가 만든 엔트리 프로젝트 공유 주소 적기 (선택)</label>
+                            <input type="text" id="entry-project-url" placeholder="예: https://playentry.org/project/65abcdef..." class="w-full bg-slate-950 text-slate-200 border border-slate-800 rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-yellow-400">
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex flex-col sm:flex-row gap-3 border-t border-slate-800 pt-3 mt-4">
+                        <button onclick="copyPadletSharedClipboard()" class="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2.5 px-3 rounded-xl text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 shadow-sm">
+                            <i class="fa-solid fa-link"></i>
+                            <span>학급 공유용 링크 복사하기</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity progress confirmation -->
+            <div class="pt-6 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <span id="act3-status-text" class="text-xs sm:text-sm font-bold text-slate-500 flex items-center gap-1.5">
+                    <i class="fa-solid fa-crown text-yellow-500"></i>
+                    <span>생성 상태: 엔트리 비디오 감지 활동 점검 대기 중</span>
+                </span>
+                <button onclick="validateActivity3()" class="w-full sm:w-auto bg-yellow-500 hover:bg-yellow-600 text-white font-extrabold px-6 py-3 rounded-2xl shadow-sm transition-all flex items-center justify-center gap-2 text-sm">
+                    <span>활동 3 완료 도장 받기</span>
+                    <i class="fa-solid fa-stamp"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- FLOATING INTEGRATED TOAST ALERTS -->
+    <div id="global-toast" class="fixed bottom-6 right-6 bg-slate-900 text-white rounded-2xl py-3.5 px-5 shadow-2xl transition-all duration-300 transform translate-y-24 opacity-0 z-50 flex items-center gap-3 border border-slate-800">
+        <div id="toast-icon-bg" class="bg-teal-500 text-white rounded-full p-2 text-xs flex items-center justify-center">
+            <i class="fa-solid fa-bell"></i>
+        </div>
+        <div>
+            <h5 class="text-xs font-extrabold text-slate-200 shadow-sm" id="toast-title">알림</h5>
+            <p class="text-[11px] text-slate-400 mt-0.5" id="toast-message">메시지 영역</p>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT REAL-TIME IMPLEMENTATION -->
+    <script>
+        // CLIENT STATE ENGINE
+        const state = {
+            stampAct1: false,
+            stampAct2: false,
+            stampAct3: false,
+            currentQuizId: null,
+            solvedQuizzes: [],
+            hasEvolved: false,
+            riggedSelection: { animal: '', color: '', accessory: '' },
+            quizVerificationCount: 0,
+
+            quizPool: [
+                {
+                    id: 1,
+                    keyword: "강아지와 초콜릿",
+                    statement: "강아지는 초콜릿을 먹으면 심장이 과도하게 빨리 뛰거나 숨쉬기 곤란해져 생명이 매우 위험해질 수 있어 절대 주면 안 된다.",
+                    isTrue: true,
+                    correctText: "🎉 훌륭히 정보 탐색을 잘했어요!",
+                    incorrectText: "초콜릿 속 '테오브로민' 성분은 강아지에게 치명적인 독약과 같으므로 먹었을 시 신속하게 병원에 데려가야 합니다.",
+                    searchHelper: "강아지 초콜릿 섭취가 위험한 과학적 이유"
+                },
+                {
+                    id: 2,
+                    keyword: "고양이와 단맛",
+                    statement: "고양이는 달콤한 아이스크림이나 설탕물을 먹으면 무척 기분 좋아하며 단맛을 사람보다 훨씬 잘 느낀다.",
+                    isTrue: false,
+                    correctText: "🎉 훌륭히 정보 탐색을 잘했어요!",
+                    incorrectText: "고양이는 단맛을 느끼는 미각 세포 수용체가 완전히 퇴화되어 있어 사탕이나 설탕의 단맛을 전혀 인지하지 못합니다.",
+                    searchHelper: "고양이 단맛 감지 미각 능력 팩트"
+                },
+                {
+                    id: 3,
+                    keyword: "금붕어의 기억력",
+                    statement: "금붕어는 기억력이 약 3초밖에 되지 않아 자기가 방금 헤엄쳤던 어항 길이나 먹이 주는 주인을 기억하지 못한다.",
+                    isTrue: false,
+                    correctText: "🎉 훌륭히 정보 탐색을 잘했어요!",
+                    incorrectText: "금붕어의 기억력은 수개월 동안 유지되며, 사람의 얼굴을 구별하거나 특정 소리가 날 때 밥을 먹는 훈련도 해냅니다.",
+                    searchHelper: "금붕어 실제 기억력 기간 실험 결과"
+                },
+                {
+                    id: 4,
+                    keyword: "토끼의 물 마시기",
+                    statement: "애완용 토끼는 그냥 맹물을 조금이라도 마시면 배가 부풀어 죽기 때문에 물을 그냥 주면 안 되고 오직 젖은 채소만 주어야 한다.",
+                    isTrue: false,
+                    correctText: "🎉 훌륭히 정보 탐색을 잘했어요!",
+                    incorrectText: "토끼도 살아가기 위해 깨끗하고 마실 수 있는 물이 매일 넉넉하게 필요합니다. 물을 안 주면 금방 위독해집니다.",
+                    searchHelper: "애완토끼 생존에 물 마시기가 필수인 이유"
+                },
+                {
+                    id: 5,
+                    keyword: "햄스터의 목욕",
+                    statement: "햄스터는 털에 먼지가 묻으면 스트레스를 받기 때문에 일주일에 한 번씩 강아지 샴푸를 이용해 따뜻한 물로 물목욕을 시켜야 한다.",
+                    isTrue: false,
+                    correctText: "🎉 훌륭히 정보 탐색을 잘했어요!",
+                    incorrectText: "햄스터는 귀에 물이 들어가면 병에 쉽게 걸리며 저체온증으로 사망할 수 있으므로 전용 목욕 모래로 스스로 씻게 해야 합니다.",
+                    searchHelper: "햄스터 물 목욕 위험성과 모래목욕"
+                },
+                {
+                    id: 6,
+                    keyword: "고양이 수염의 힘",
+                    statement: "고양이 얼굴에 양쪽으로 돋아난 수염은 미용적인 털일 뿐이며 잘라내도 일상생활을 하는 데 아무 지장이 없다.",
+                    isTrue: false,
+                    correctText: "🎉 훌륭히 정보 탐색을 잘했어요!",
+                    incorrectText: "고양이 수염은 바람의 방향, 공간 넓이 측정, 평형감각을 잡는 신경이 몰린 최고의 감각 센서라 함부로 자르면 다칩니다.",
+                    searchHelper: "고양이 수염의 중요 감각 기능과 역할"
+                },
+                {
+                    id: 7,
+                    keyword: "달팽이의 이빨",
+                    statement: "작고 느린 정원 달팽이는 이빨이 없는 연체동물처럼 보이지만, 사실 돋보기로 보면 1만 개가 넘는 미세한 이빨을 가지고 있다.",
+                    isTrue: true,
+                    correctText: "🎉 훌륭히 정보 탐색을 잘했어요!",
+                    incorrectText: "달팽이는 '치설'이라는 가시가 촘촘히 돋은 혀 형태의 이빨을 가지고 있어서 상추나 질긴 채소를 갈아 가며 맛있게 식사합니다.",
+                    searchHelper: "달팽이 이빨 치설 개수와 먹이 섭취"
+                },
+                {
+                    id: 8,
+                    keyword: "카멜레온 피부색 변신",
+                    statement: "카멜레온이 신비롭게 피부색을 바꾸는 유일한 목적은 적의 눈을 완벽하게 따돌려 주변 풀밭이나 돌의 배경색과 똑같이 맞추기 위함이다.",
+                    isTrue: false,
+                    correctText: "🎉 훌륭히 정보 탐색을 잘했어요!",
+                    incorrectText: "카멜레온은 단순히 적을 피할 때 외에도 몸의 체온을 높이거나 낮추기 위해, 또는 화가 나거나 기쁠 때 감정 표현으로 색을 바꿉니다.",
+                    searchHelper: "카멜레온 몸 색깔 변하는 실제 원인"
+                },
+                {
+                    id: 9,
+                    keyword: "고래 숨구멍 분수",
+                    statement: "바다의 고래가 등에 있는 숨구멍으로 하늘 높이 거대하게 쏘아 올리는 기둥은 빨아들였던 실제 차가운 바닷물 분수쇼이다.",
+                    isTrue: false,
+                    correctText: "🎉 훌륭히 정보 탐색을 잘했어요!",
+                    incorrectText: "고래가 숨을 힘껏 내쉴 때 폐 속의 따뜻한 날숨 공기가 차가운 외부 공기와 만나 물수증기로 하얗게 응축되어 기둥으로 보이는 현상입니다.",
+                    searchHelper: "고래 분기공 수증기 기둥 정체"
+                },
+                {
+                    id: 10,
+                    keyword: "자이언트 판다 소화관",
+                    statement: "자이언트 판다는 대나무를 하루 종일 맛있게 먹는 소식가처럼 보이지만, 소화기관 자체는 고기를 사냥해 먹던 육식동물 구조를 유지하고 있다.",
+                    isTrue: true,
+                    correctText: "🎉 훌륭히 정보 탐색을 잘했어요!",
+                    incorrectText: "판다는 육식 조상 곰의 위와 짧은 창자를 그대로 갖고 있어 대나무 섬유질을 소화하기 어렵습니다. 그래서 생존을 위해 막대한 양을 먹습니다.",
+                    searchHelper: "판다 대나무 소화와 소화기관 특징"
+                }
+            ]
+        };
+
+        let canvas, ctx;
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+        let brushColor = '#1e293b';
+        let brushSize = 5;
+
+        window.onload = function() {
+            showToast("활동지 로드 완료!", "파스텔 민트의 3~4차시 맞춤형 디지털 활동지에 접속했습니다.", "fa-rocket", "bg-teal-500");
+            pickRandomQuiz();
+            switchTab('act1');
+            initSketchpad();
+        };
+
+        function initSketchpad() {
+            canvas = document.getElementById('sketchpad');
+            ctx = canvas.getContext('2d');
+
+            const rect = canvas.parentNode.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = brushColor;
+            ctx.lineWidth = brushSize;
+
+            canvas.addEventListener('mousedown', (e) => {
+                isDrawing = true;
+                [lastX, lastY] = getCoordinates(e);
+            });
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', () => isDrawing = false);
+            canvas.addEventListener('mouseout', () => isDrawing = false);
+
+            canvas.addEventListener('touchstart', (e) => {
+                isDrawing = true;
+                const touch = e.touches[0];
+                [lastX, lastY] = getCoordinates(touch);
+                e.preventDefault();
+            }, { passive: false });
+
+            canvas.addEventListener('touchmove', (e) => {
+                if (!isDrawing) return;
+                const touch = e.touches[0];
+                draw(touch);
+                e.preventDefault();
+            }, { passive: false });
+
+            canvas.addEventListener('touchend', () => { isDrawing = false; });
+        }
+
+        function getCoordinates(e) {
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+            const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+            return [x, y];
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            const [x, y] = getCoordinates(e);
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            [lastX, lastY] = [x, y];
+        }
+
+        function setPenColor(color) {
+            brushColor = color;
+            ctx.strokeStyle = color;
+            ctx.globalCompositeOperation = 'source-over';
+            showToast("색상 교체", "붓의 색상이 새롭게 변경되었습니다.", "fa-palette", "bg-yellow-500");
+        }
+
+        function useEraser() {
+            ctx.globalCompositeOperation = 'destination-out';
+            showToast("지우개 작동", "스케치북의 일부분을 깨끗하게 지울 수 있습니다.", "fa-eraser", "bg-slate-500");
+        }
+
+        function setBrushSize(size) {
+            brushSize = size;
+            ctx.lineWidth = size;
+        }
+
+        function clearSketchpad() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.globalCompositeOperation = 'source-over';
+            showToast("도화지 청소", "도화지가 새롭게 초기화되어 깨끗해졌습니다.", "fa-rotate", "bg-slate-500");
+        }
+
+        function switchTab(targetTab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('block'));
+
+            document.getElementById(`tab-content-${targetTab}`).classList.remove('hidden');
+            document.getElementById(`tab-content-${targetTab}`).classList.add('block');
+
+            const tabs = ['act1', 'act2', 'act3'];
+            tabs.forEach(tab => {
+                const card = document.getElementById(`tab-card-${tab}`);
+                if (tab === targetTab) {
+                    if (tab === 'act1') card.className = "bg-white border-2 tab-active-1 p-4 rounded-[22px] shadow-sm flex flex-col items-center text-center gap-1.5 transition-all scale-[1.03]";
+                    if (tab === 'act2') card.className = "bg-white border-2 tab-active-2 p-4 rounded-[22px] shadow-sm flex flex-col items-center text-center gap-1.5 transition-all scale-[1.03]";
+                    if (tab === 'act3') card.className = "bg-white border-2 tab-active-3 p-4 rounded-[22px] shadow-sm flex flex-col items-center text-center gap-1.5 transition-all scale-[1.03]";
+                } else {
+                    card.className = "bg-white border-2 border-slate-100 hover:border-slate-200 p-4 rounded-[22px] shadow-sm flex flex-col items-center text-center gap-1.5 transition-all opacity-80 scale-100";
+                }
+            });
+
+            if (targetTab === 'act2') {
+                setTimeout(initSketchpad, 100);
+            }
+        }
+
+        function showToast(title, message, iconClass = "fa-bell", bgClass = "bg-teal-500") {
+            const toast = document.getElementById('global-toast');
+            const iconBg = document.getElementById('toast-icon-bg');
+            const toastTitle = document.getElementById('toast-title');
+            const toastMsg = document.getElementById('toast-message');
+
+            toastTitle.textContent = title;
+            toastMsg.textContent = message;
+            iconBg.className = `rounded-full p-2 text-xs flex items-center justify-center ${bgClass}`;
+            iconBg.innerHTML = `<i class="fa-solid ${iconClass}"></i>`;
+
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 4500);
+        }
+
+        function resetActivitySheet() {
+            if (confirm("모든 활동 상태를 원래대로 복원하시겠습니까?")) {
+                window.location.reload();
+            }
+        }
+
+        function pickRandomQuiz() {
+            const unsolved = state.quizPool.filter(q => !state.solvedQuizzes.includes(q.id));
+
+            const quizContainer = document.getElementById('quiz-container');
+
+            if (unsolved.length === 0) {
+                quizContainer.innerHTML = `
+                    <div class="text-center py-8 space-y-4">
+                        <span class="text-5xl">🏆</span>
+                        <h4 class="font-extrabold text-teal-900 text-lg jua-font">축하합니다! 10개 팩트체크를 모두 맞추셨습니다!</h4>
+                        <p class="text-xs sm:text-sm text-slate-500">인공지능이 주는 정보의 오류를 비판적으로 분별할 수 있는 위대한 검증 탐정으로 인정합니다.</p>
+                        <button onclick="resetQuizProgressOnly()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold px-5 py-2.5 rounded-xl text-xs transition-colors shadow-sm">문제 다시 처음부터 풀기</button>
+                    </div>
+                `;
+                return;
+            }
+
+            const randIdx = Math.floor(Math.random() * unsolved.length);
+            const currentQuiz = unsolved[randIdx];
+            state.currentQuizId = currentQuiz.id;
+
+            document.getElementById('quiz-number-badge').textContent = `AI 주장 (맞춘 문제: ${state.solvedQuizzes.length}/10)`;
+            document.getElementById('quiz-keyword-badge').textContent = `키워드: ${currentQuiz.keyword}`;
+            document.getElementById('quiz-statement').textContent = `"${currentQuiz.statement}"`;
+            document.getElementById('quiz-search-helper').textContent = currentQuiz.searchHelper;
+
+            document.getElementById('quiz-result-feedback').classList.add('hidden');
+            document.getElementById('btn-quiz-true').className = "bg-white border border-slate-200 hover:border-emerald-300 rounded-2xl p-4 text-center transition-all shadow-sm";
+            document.getElementById('btn-quiz-false').className = "bg-white border border-slate-200 hover:border-rose-300 rounded-2xl p-4 text-center transition-all shadow-sm";
+        }
+
+        function resetQuizProgressOnly() {
+            state.solvedQuizzes = [];
+            state.quizVerificationCount = 0;
+            const quizContainer = document.getElementById('quiz-container');
+            quizContainer.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <span id="quiz-number-badge" class="bg-teal-100 text-teal-800 text-xs font-black px-3 py-1 rounded-full">AI 주장 1</span>
+                    <span id="quiz-keyword-badge" class="text-xs text-slate-400 font-bold">키워드: 로딩 중...</span>
+                </div>
+                <blockquote id="quiz-statement" class="text-slate-700 font-semibold text-sm sm:text-base border-l-4 border-teal-500 pl-4 py-1.5 leading-relaxed min-h-[60px]">질문을 소환하는 중입니다...</blockquote>
+                <div class="text-xs text-slate-400 flex items-center gap-1.5">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <span>추천 팩트체크 검색어: <strong id="quiz-search-helper" class="text-teal-600">로딩 중...</strong></span>
+                </div>
+                <div class="grid grid-cols-2 gap-4 pt-2">
+                    <button onclick="submitQuizAnswer(true)" id="btn-quiz-true" class="bg-white border border-slate-200 hover:border-emerald-300 rounded-2xl p-4 text-center transition-all shadow-sm"><span class="text-4xl block">🙆‍♂️</span><span class="block text-xs font-bold text-emerald-600 mt-2">진실 (True)</span></button>
+                    <button onclick="submitQuizAnswer(false)" id="btn-quiz-false" class="bg-white border border-slate-200 hover:border-rose-300 rounded-2xl p-4 text-center transition-all shadow-sm"><span class="text-4xl block">🙅‍♀️</span><span class="block text-xs font-bold text-rose-600 mt-2">거짓 (False)</span></button>
+                </div>
+                <div id="quiz-result-feedback" class="hidden bg-white border rounded-2xl p-5 text-xs sm:text-sm text-slate-600 shadow-inner space-y-2"><div id="feedback-title" class="font-black flex items-center gap-1.5"></div><p id="feedback-text" class="leading-relaxed"></p></div>
+            `;
+            pickRandomQuiz();
+        }
+
+        function submitQuizAnswer(userChoice) {
+            const currentQuiz = state.quizPool.find(q => q.id === state.currentQuizId);
+            const isCorrect = userChoice === currentQuiz.isTrue;
+
+            const feedbackBox = document.getElementById('quiz-result-feedback');
+            const feedbackTitle = document.getElementById('feedback-title');
+            const feedbackText = document.getElementById('feedback-text');
+
+            feedbackBox.classList.remove('hidden');
+            state.quizVerificationCount++;
+
+            const tBtn = document.getElementById('btn-quiz-true');
+            const fBtn = document.getElementById('btn-quiz-false');
+
+            if (userChoice === true) {
+                tBtn.className = "bg-teal-50 border-2 border-teal-500 rounded-2xl p-4 text-center transition-all shadow-sm";
+                fBtn.className = "bg-white border border-slate-100 rounded-2xl p-4 text-center transition-all shadow-sm opacity-50";
+            } else {
+                fBtn.className = "bg-rose-50 border-2 border-rose-500 rounded-2xl p-4 text-center transition-all shadow-sm";
+                tBtn.className = "bg-white border border-slate-100 rounded-2xl p-4 text-center transition-all shadow-sm opacity-50";
+            }
+
+            if (isCorrect) {
+                feedbackTitle.className = "font-black flex items-center gap-1.5 text-emerald-600";
+                feedbackTitle.innerHTML = `<i class="fa-solid fa-circle-check"></i> ${currentQuiz.correctText}`;
+                feedbackText.textContent = "잘했어요! 다음 문제를 맞춰볼까요?";
+
+                if (!state.solvedQuizzes.includes(currentQuiz.id)) {
+                    state.solvedQuizzes.push(currentQuiz.id);
+                }
+                showToast("검증 성공!", "팩트 조사를 통해 올바른 사실을 발견했습니다!", "fa-circle-check", "bg-emerald-500");
+            } else {
+                feedbackTitle.className = "font-black flex items-center gap-1.5 text-rose-600";
+                feedbackTitle.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> 아쉽지만 오답 또는 사실을 잘못 파악하셨습니다!`;
+                feedbackText.innerHTML = `<strong>정확한 과학적 사실:</strong> ${currentQuiz.incorrectText}`;
+                showToast("잘못된 사실 파악", "추천 검색어로 포털이나 사전에서 다시 정보를 정확히 조사해 보세요.", "fa-circle-exclamation", "bg-rose-500");
+            }
+        }
+
+        function validateActivity1() {
+            if(state.solvedQuizzes.length < 5) {
+                showToast("도장 조건 미달", "더 확실한 정보 판단을 위해 퀴즈 10문제 중 최소 5문제 이상은 정답을 완전히 맞추어 제외시켜야 통과합니다.", "fa-magnifying-glass", "bg-yellow-500");
+                return;
+            }
+
+            state.stampAct1 = true;
+            const stamp = document.getElementById('stamp-act1');
+            stamp.className = "w-12 h-12 rounded-full bg-teal-500 border-2 border-teal-600 flex flex-col items-center justify-center text-white font-extrabold transition-all duration-300 relative stamp-glow";
+            stamp.innerHTML = `<i class="fa-solid fa-stamp text-xs"></i><span class="text-[7px] font-black">획득완료</span>`;
+
+            showToast("활동 1 도장 획득!", "활동 1 '비판적 사고' 도장을 획득하셨습니다!", "fa-stamp", "bg-teal-500");
+        }
+
+        function setRiggedOption(type, value) {
+            state.riggedSelection[type] = value;
+            const group = {
+                animal: ['dog', 'rabbit', 'lizard', 'cat', 'hamster'],
+                color: ['pink', 'green', 'yellow', 'blue', 'purple'],
+                accessory: ['ribbon', 'glasses', 'hat', 'scarf']
+            };
+            const prefix = type === 'accessory' ? 'acc' : type;
+
+            group[type].forEach(id => {
+                const btn = document.getElementById(`rig-${prefix}-${id}`);
+                if (btn) btn.className = "py-2 bg-white border border-slate-200 text-xs font-bold rounded-xl hover:bg-slate-50 transition-colors";
+            });
+
+            const mapper = {
+                '강아지': 'dog', '토끼': 'rabbit', '도마뱀': 'lizard', '고양이': 'cat', '햄스터': 'hamster',
+                '분홍색': 'pink', '초록색': 'green', '노란색': 'yellow', '파란색': 'blue', '보라색': 'purple',
+                '리본': 'ribbon', '안경': 'glasses', '모자': 'hat', '스카프': 'scarf'
+            };
+            const selected = document.getElementById(`rig-${prefix}-${mapper[value]}`);
+            if (selected) {
+                selected.className = "py-2 bg-rose-50 border-2 border-rose-400 text-rose-700 text-xs font-bold rounded-xl shadow-sm transition-colors";
+            }
+        }
+
+        function buildRiggedSVGLocal(animal, colorName, accName) {
+            const size = 200;
+            const colorGradients = {
+                '분홍색': { light: '#fff1f2', mid: '#fecdd3', dark: '#f43f5e', shadow: '#e11d48' },
+                '초록색': { light: '#f0fdf4', mid: '#bbf7d0', dark: '#22c55e', shadow: '#16a34a' },
+                '노란색': { light: '#fefce8', mid: '#fef08a', dark: '#eab308', shadow: '#ca8a04' },
+                '파란색': { light: '#eff6ff', mid: '#bfdbfe', dark: '#3b82f6', shadow: '#2563eb' },
+                '보라색': { light: '#faf5ff', mid: '#e9d5ff', dark: '#a855f7', shadow: '#9333ea' }
+            };
+            const grad = colorGradients[colorName] || { light: '#f8fafc', mid: '#e2e8f0', dark: '#cbd5e1', shadow: '#94a3b8' };
+            const strokeColor = "#1e293b";
+
+            let animalMarkup = "";
+            if (animal === '강아지') {
+                animalMarkup = `
+                    <ellipse cx="100" cy="135" rx="32" ry="28" fill="url(#main-grad)" stroke="${strokeColor}" stroke-width="3.5" filter="url(#shadow)" />
+                    <ellipse cx="100" cy="135" rx="20" ry="16" fill="${grad.light}" opacity="0.5" />
+                    <circle cx="82" cy="155" r="8" fill="url(#main-grad)" stroke="${strokeColor}" stroke-width="3" />
+                    <circle cx="118" cy="155" r="8" fill="url(#main-grad)" stroke="${strokeColor}" stroke-width="3" />
+                    <ellipse cx="100" cy="94" rx="36" ry="31" fill="url(#main-grad)" stroke="${strokeColor}" stroke-width="3.5" filter="url(#shadow)" />
+                    <path d="M68,76 C50,75 48,118 64,112 Z" fill="url(#dark-grad)" stroke="${strokeColor}" stroke-width="3.5" stroke-linejoin="round" />
+                    <path d="M132,76 C150,75 152,118 136,112 Z" fill="url(#dark-grad)" stroke="${strokeColor}" stroke-width="3.5" stroke-linejoin="round" />
+                    <circle cx="86" cy="95" r="7" fill="#1e293b" />
+                    <circle cx="84" cy="92" r="2.5" fill="#fff" />
+                    <circle cx="88" cy="97" r="1" fill="#fff" />
+                    <circle cx="114" cy="95" r="7" fill="#1e293b" />
+                    <circle cx="112" cy="92" r="2.5" fill="#fff" />
+                    <circle cx="116" cy="97" r="1" fill="#fff" />
+                    <circle cx="74" cy="106" r="6" fill="#fb7185" opacity="0.5" />
+                    <circle cx="126" cy="106" r="6" fill="#fb7185" opacity="0.5" />
+                    <ellipse cx="100" cy="109" rx="13" ry="10" fill="#ffffff" stroke="${strokeColor}" stroke-width="2.5" />
+                    <ellipse cx="100" cy="104" rx="6" ry="4.5" fill="#1e293b" />
+                    <path d="M96,111 C96,117 104,117 104,111 Z" fill="#f43f5e" stroke="${strokeColor}" stroke-width="2" />
+                    <path d="M95,110 C98,111 100,109 100,109 C100,109 102,111 105,110" fill="none" stroke="${strokeColor}" stroke-width="2.5" />
+                `;
+            } else if (animal === '토끼') {
+                animalMarkup = `
+                    <ellipse cx="100" cy="135" rx="32" ry="28" fill="url(#main-grad)" stroke="${strokeColor}" stroke-width="3.5" filter="url(#shadow)" />
+                    <circle cx="66" cy="142" r="9" fill="#ffffff" stroke="${strokeColor}" stroke-width="3" />
+                    <ellipse cx="100" cy="96" rx="34" ry="29" fill="url(#main-grad)" stroke="${strokeColor}" stroke-width="3.5" filter="url(#shadow)" />
+                    <path d="M82,74 C70,30 90,26 90,74 Z" fill="url(#main-grad)" stroke="${strokeColor}" stroke-width="3.5" stroke-linejoin="round" />
+                    <path d="M84,72 C76,38 86,36 86,72 Z" fill="#fda4af" />
+                    <path d="M118,74 C130,30 110,26 110,74 Z" fill="url(#main-grad)" stroke="${strokeColor}" stroke-width="3.5" stroke-linejoin="round" />
+                    <path d="M116,72 C124,38 114,36 114,72 Z" fill="#fda4af" />
+                    <circle cx="86" cy="96" r="7" fill="#1e293b" />
+                    <circle cx="84" cy="93" r="2.5" fill="#fff" />
+                    <circle cx="88" cy="98" r="1" fill="#fff" />
+                    <circle cx="114" cy="96" r="7" fill="#1e293b" />
+                    <circle cx="112" cy="93" r="2.5" fill="#fff" />
+                    <circle cx="116" cy="98" r="1" fill="#fff" />
+                    <circle cx="74" cy="107" r="6" fill="#fb7185" opacity="0.5" />
+                    <circle cx="126" cy="107" r="6" fill="#fb7185" opacity="0.5" />
+                    <polygon points="98,102 102,102 100,105" fill="#fb7185" />
+                    <path d="M96,108 C98,110 100,108 100,108 C100,108 102,110 104,108" fill="none" stroke="${strokeColor}" stroke-width="2.5" stroke-linecap="round" />
+                    <rect x="98" y="108" width="4" height="4" fill="#ffffff" stroke="${strokeColor}" stroke-width="1.5" />
+                `;
+            } else if (animal === '도마뱀') {
+                animalMarkup = `
+                    <path d="M115,135 C160,150 160,110 105,108" fill="none" stroke="url(#dark-grad)" stroke-width="14" stroke-linecap="round" />
+                    <path d="M115,135 C160,150 160,110 105,108" fill="none" stroke="${strokeColor}" stroke-width="3.5" stroke-linecap="round" />
+                    <ellipse cx="100" cy="130" rx="25" ry="29" fill="url(#main-grad)" stroke="${strokeColor}" stroke-width="3.5" filter="url(#shadow)" />
+                    <ellipse cx="100" cy="130" rx="14" ry="18" fill="#fef08a" opacity="0.6" stroke="${strokeColor}" stroke-width="1.5" />
+                    <path d="M72,100 C70,72 100,58 100,58 C100,58 130,72 128,100 C125,120 75,120 72,100 Z" fill="url(#main-grad)" stroke="${strokeColor}" stroke-width="3.5" stroke-linejoin="round" filter="url(#shadow)" />
+                    <circle cx="85" cy="90" r="9" fill="#1e293b" />
+                    <circle cx="88" cy="87" r="3.5" fill="#fff" />
+                    <circle cx="83" cy="92" r="1" fill="#fff" />
+                    <circle cx="115" cy="90" r="9" fill="#1e293b" />
+                    <circle cx="118" cy="87" r="3.5" fill="#fff" />
+                    <circle cx="113" cy="92" r="1" fill="#fff" />
+                    <path d="M90,100 C100,108 100,108 110,100" fill="none" stroke="${strokeColor}" stroke-width="3.5" stroke-linecap="round" />
+                    <circle cx="76" cy="100" r="5" fill="#fb7185" opacity="0.5" />
+                    <circle cx="124" cy="100" r="5" fill="#fb7185" opacity="0.5" />
+                `;
+            } else if (animal === '고양이') {
+                animalMarkup = `
+                    <ellipse cx="100" cy="135" rx="32" ry="27" fill="url(#main-grad)" stroke="${strokeColor}" stroke-width="3.5" filter="url(#shadow)" />
+                    <path d="M118,135 C140,140 145,115 140,100" fill="none" stroke="url(#main-grad)" stroke-width="10" stroke-linecap="round" />
+                    <path d="M118,135 C140,140 145,115 140,100" fill="none" stroke="${strokeColor}" stroke-width="3.5" stroke-linecap="round" />
+                    <ellipse cx="100" cy="94" rx="36" ry="30" fill="url(#main-grad)" stroke="${strokeColor}" stroke-width="3.5" filter="url(#shadow)" />
+                    <polygon points="70,82 72,52 95,72" fill="url(#main-grad)" stroke="${strokeColor}" stroke-width="3.5" stroke-linejoin="round" />
+                    <polygon points="76,79 78,60 91,72" fill="#fda4af" />
+                    <polygon points="130,82 128,52 105,72" fill="url(#main-grad)" stroke="${strokeColor}" stroke-width="3.5" stroke-linejoin="round" />
+                    <polygon points="124,79 122,60 109,72" fill="#fda4af" />
+                    <circle cx="86" cy="95" r="7" fill="#1e293b" />
+                    <circle cx="84" cy="92" r="2.5" fill="#fff" />
+                    <circle cx="88" cy="97" r="1" fill="#fff" />
+                    <circle cx="114" cy="95" r="7" fill="#1e293b" />
+                    <circle cx="112" cy="92" r="2.5" fill="#fff" />
+                    <circle cx="116" cy="97" r="1" fill="#fff" />
+                    <circle cx="74" cy="104" r="6" fill="#fb7185" opacity="0.5" />
+                    <circle cx="126" cy="104" r="6" fill="#fb7185" opacity="0.5" />
+                    <polygon points="98,101 102,101 100,104" fill="#fb7185" />
+                    <path d="M96,106 C100,109 100,106 100,106 C100,106 100,109 104,106" fill="none" stroke="${strokeColor}" stroke-width="2.5" stroke-linecap="round" />
+                    <line x1="70" y1="100" x2="52" y2="98" stroke="${strokeColor}" stroke-width="2.5" stroke-linecap="round" />
+                    <line x1="72" y1="106" x2="54" y2="108" stroke="${strokeColor}" stroke-width="2.5" stroke-linecap="round" />
+                    <line x1="130" y1="100" x2="148" y2="98" stroke="${strokeColor}" stroke-width="2.5" stroke-linecap="round" />
+                    <line x1="128" y1="106" x2="146" y2="108" stroke="${strokeColor}" stroke-width="2.5" stroke-linecap="round" />
+                `;
+            } else if (animal === '햄스터') {
+                animalMarkup = `
+                    <ellipse cx="100" cy="126" rx="38" ry="34" fill="url(#main-grad)" stroke="${strokeColor}" stroke-width="3.5" filter="url(#shadow)" />
+                    <ellipse cx="100" cy="130" rx="22" ry="20" fill="${grad.light}" opacity="0.5" />
+                    <ellipse cx="100" cy="98" rx="42" ry="33" fill="url(#main-grad)" stroke="${strokeColor}" stroke-width="3.5" filter="url(#shadow)" />
+                    <circle cx="72" cy="74" r="14" fill="url(#main-grad)" stroke="${strokeColor}" stroke-width="3.5" />
+                    <circle cx="72" cy="74" r="8" fill="#fda4af" />
+                    <circle cx="128" cy="74" r="14" fill="url(#main-grad)" stroke="${strokeColor}" stroke-width="3.5" />
+                    <circle cx="128" cy="74" r="8" fill="#fda4af" />
+                    <circle cx="84" cy="98" r="7" fill="#1e293b" />
+                    <circle cx="82" cy="95" r="2.5" fill="#fff" />
+                    <circle cx="86" cy="100" r="1" fill="#fff" />
+                    <circle cx="116" cy="98" r="7" fill="#1e293b" />
+                    <circle cx="114" cy="95" r="2.5" fill="#fff" />
+                    <circle cx="118" cy="100" r="1" fill="#fff" />
+                    <ellipse cx="68" cy="112" rx="12" ry="10" fill="#fb7185" opacity="0.6" />
+                    <ellipse cx="132" cy="112" rx="12" ry="10" fill="#fb7185" opacity="0.6" />
+                    <polygon points="98,103 102,103 100,106" fill="#fb7185" />
+                    <path d="M96,109 C98,111 100,109 100,109 C100,109 102,111 104,109" fill="none" stroke="${strokeColor}" stroke-width="2.5" stroke-linecap="round" />
+                    <rect x="99" y="109" width="2" height="3" fill="#ffffff" stroke="${strokeColor}" stroke-width="1" />
+                    <ellipse cx="100" cy="122" rx="6" ry="8" fill="#fbbf24" stroke="${strokeColor}" stroke-width="2" />
+                    <ellipse cx="94" cy="125" r="5" fill="#ffffff" stroke="${strokeColor}" stroke-width="2.5" />
+                    <ellipse cx="106" cy="125" r="5" fill="#ffffff" stroke="${strokeColor}" stroke-width="2.5" />
+                `;
+            }
+
+            let accMarkup = "";
+            if (accName === '리본') {
+                accMarkup = `
+                    <g id="acc-ribbon-item" filter="url(#shadow)">
+                        <path d="M100,123 C80,105 75,135 96,125 Z" fill="#ef4444" stroke="${strokeColor}" stroke-width="3" stroke-linejoin="round" />
+                        <path d="M88,118 C82,112 80,124 92,122" fill="none" stroke="#b91c1c" stroke-width="1.5" />
+                        <path d="M100,123 C120,105 125,135 104,125 Z" fill="#ef4444" stroke="${strokeColor}" stroke-width="3" stroke-linejoin="round" />
+                        <path d="M112,118 C118,112 120,124 108,122" fill="none" stroke="#b91c1c" stroke-width="1.5" />
+                        <path d="M98,125 L92,138 L99,134 Z" fill="#ef4444" stroke="${strokeColor}" stroke-width="2" />
+                        <path d="M102,125 L108,138 L101,134 Z" fill="#ef4444" stroke="${strokeColor}" stroke-width="2" />
+                        <circle cx="100" cy="123" r="6" fill="#facc15" stroke="${strokeColor}" stroke-width="2.5" />
+                    </g>
+                `;
+            } else if (accName === '안경') {
+                accMarkup = `
+                    <g id="acc-glasses-item">
+                        <circle cx="85" cy="95" r="14" fill="none" stroke="#f43f5e" stroke-width="3.5" />
+                        <path d="M75,85 L85,95" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.7" />
+                        <circle cx="115" cy="95" r="14" fill="none" stroke="#f43f5e" stroke-width="3.5" />
+                        <path d="M105,85 L115,95" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.7" />
+                        <path d="M97,95 Q100,91 103,95" fill="none" stroke="#f43f5e" stroke-width="3.5" stroke-linecap="round" />
+                        <path d="M71,95 Q64,90 60,94" fill="none" stroke="#f43f5e" stroke-width="3" stroke-linecap="round" />
+                        <path d="M129,95 Q136,90 140,94" fill="none" stroke="#f43f5e" stroke-width="3" stroke-linecap="round" />
+                    </g>
+                `;
+            } else if (accName === '모자') {
+                accMarkup = `
+                    <g id="acc-hat-item" filter="url(#shadow)">
+                        <polygon points="82,68 118,68 100,32" fill="#fbbf24" stroke="${strokeColor}" stroke-width="3.5" stroke-linejoin="round" />
+                        <path d="M87,58 Q100,56 113,58" fill="none" stroke="#f43f5e" stroke-width="3" />
+                        <path d="M91,48 Q100,47 109,48" fill="none" stroke="#3b82f6" stroke-width="3" />
+                        <circle cx="100" cy="28" r="6.5" fill="#ef4444" stroke="${strokeColor}" stroke-width="2" />
+                        <path d="M78,68 Q80,72 82,68 Q84,72 86,68 Q88,72 90,68 Q92,72 94,68 Q96,72 98,68 Q100,72 102,68 Q104,72 106,68 Q108,72 110,68 Q112,72 114,68 Q116,72 118,68 Q120,72 122,68" fill="none" stroke="${strokeColor}" stroke-width="3" stroke-linecap="round" />
+                    </g>
+                `;
+            } else if (accName === '스카프') {
+                accMarkup = `
+                    <g id="acc-scarf-item" filter="url(#shadow)">
+                        <path d="M72,126 Q100,138 128,126" fill="none" stroke="#dc2626" stroke-width="12" stroke-linecap="round" />
+                        <path d="M72,126 Q100,138 128,126" fill="none" stroke="#f8fafc" stroke-width="12" stroke-linecap="round" stroke-dasharray="6,8" />
+                        <path d="M72,126 Q100,138 128,126" fill="none" stroke="${strokeColor}" stroke-width="12" stroke-linecap="round" opacity="0.1" />
+                        <path d="M112,128 L122,148" fill="none" stroke="#dc2626" stroke-width="10" stroke-linecap="round" />
+                        <path d="M112,128 L122,148" fill="none" stroke="#f8fafc" stroke-width="10" stroke-linecap="round" stroke-dasharray="5,6" />
+                        <path d="M71,120 Q100,133 129,120" fill="none" stroke="${strokeColor}" stroke-width="2" stroke-linecap="round" />
+                        <path d="M71,132 Q100,145 129,132" fill="none" stroke="${strokeColor}" stroke-width="2" stroke-linecap="round" />
+                    </g>
+                `;
+            }
+
+            return `
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" class="w-full h-full">
+                    <defs>
+                        <radialGradient id="main-grad" cx="35%" cy="35%" r="65%">
+                            <stop offset="0%" stop-color="${grad.light}" />
+                            <stop offset="65%" stop-color="${grad.mid}" />
+                            <stop offset="100%" stop-color="${grad.dark}" />
+                        </radialGradient>
+                        <linearGradient id="dark-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="${grad.mid}" />
+                            <stop offset="100%" stop-color="${grad.shadow}" />
+                        </linearGradient>
+                        <filter id="shadow" x="-20%" y="-20%" width="150%" height="150%">
+                            <feDropShadow dx="3" dy="6" stdDeviation="4" flood-color="#0f172a" flood-opacity="0.15"/>
+                        </filter>
+                    </defs>
+                    <rect width="${size}" height="${size}" rx="24" fill="#f0f9f6" />
+                    <ellipse cx="100" cy="155" rx="42" ry="10" fill="#0f172a" opacity="0.1" />
+
+                    ${animalMarkup}
+                    ${accMarkup}
+                </svg>
+            `;
+        }
+
+        function generateRiggedNano() {
+            const { animal, color, accessory } = state.riggedSelection;
+            if(!animal || !color || !accessory) {
+                showToast("옵션 누락", "동물 종류, 색깔, 액세서리 버튼 옵션을 모두 한 가지씩 골라주세요.", "fa-mouse", "bg-yellow-500");
+                return;
+            }
+
+            const loader = document.getElementById('rigged-loading');
+            const placeholder = document.getElementById('rigged-placeholder');
+            const resultImg = document.getElementById('rigged-img-result');
+
+            loader.classList.remove('hidden');
+            placeholder.classList.add('hidden');
+            resultImg.classList.add('hidden');
+
+            setTimeout(() => {
+                try {
+                    const localSVGString = buildRiggedSVGLocal(animal, color, accessory);
+                    resultImg.src = `data:image/svg+xml;utf8,${encodeURIComponent(localSVGString)}`;
+                    resultImg.classList.remove('hidden');
+                    showToast("조합 완료!", "로컬 시각화 엔진으로 이미지를 완벽하게 합성했습니다.", "fa-circle-check", "bg-emerald-500");
+                } catch (err) {
+                    showToast("오류 발생", "이미지 생성 도중 버그가 탐지되었습니다.", "fa-bug", "bg-rose-500");
+                } finally {
+                    loader.classList.add('hidden');
+                }
+            }, 800);
+        }
+
+        function validateActivity2() {
+            const promptText = document.getElementById('prompt-creator-input').value.trim();
+            if(promptText.length < 10) {
+                showToast("프롬프트 미달", "짝꿍이 상상해서 그릴 수 있도록 더 자세한 프롬프트(10자 이상)를 적어주세요!", "fa-pen", "bg-yellow-500");
+                return;
+            }
+
+            state.stampAct2 = true;
+            const stamp = document.getElementById('stamp-act2');
+            stamp.className = "w-12 h-12 rounded-full bg-rose-500 border-2 border-rose-600 flex flex-col items-center justify-center text-white font-extrabold transition-all duration-300 relative stamp-glow";
+            stamp.innerHTML = `<i class="fa-solid fa-stamp text-xs"></i><span class="text-[7px] font-black">획득완료</span>`;
+
+            document.getElementById('act2-status-text').innerHTML = `<i class="fa-solid fa-check-circle text-rose-500"></i> <strong>훈련 완료! 짝꿍과 프롬프트 드로잉 활동 마침</strong>`;
+            showToast("활동 2 도장 획득!", "활동 2 '주체성' 도장을 획득하셨습니다!", "fa-stamp", "bg-rose-500");
+        }
+
+        function validateActivity3() {
+            const chk1 = document.getElementById('chk-step1').checked;
+            const chk2 = document.getElementById('chk-step2').checked;
+            const chk3 = document.getElementById('chk-step3').checked;
+
+            if(!chk1 || !chk2 || !chk3) {
+                showToast("체크리스트 미완료", "코딩 완성 체크리스트 3가지를 모두 달성하고 체크를 완료해야 도장이 활성화됩니다.", "fa-list-check", "bg-yellow-500");
+                return;
+            }
+
+            state.stampAct3 = true;
+            const stamp = document.getElementById('stamp-act3');
+            stamp.className = "w-12 h-12 rounded-full bg-yellow-500 border-2 border-yellow-600 flex flex-col items-center justify-center text-white font-extrabold transition-all duration-300 relative stamp-glow";
+            stamp.innerHTML = `<i class="fa-solid fa-stamp text-xs"></i><span class="text-[7px] font-black">획득완료</span>`;
+
+            document.getElementById('act3-status-text').innerHTML = `🎉 <strong>모든 활동 마스터! 엔트리 인공지능 비디오 코딩을 성공적으로 마쳤습니다!</strong>`;
+            showToast("모든 미션 올 클리어!", "축하합니다! 3~4차시 모든 배움의 도장을 완성해 마스터가 되었습니다!", "fa-crown", "bg-yellow-500");
+        }
+
+        function copyPadletSharedClipboard() {
+            const urlInput = document.getElementById('entry-project-url').value.trim();
+            const copyValue = urlInput || "https://playentry.org";
+
+            const tempBox = document.createElement('textarea');
+            tempBox.value = copyValue;
+            document.body.appendChild(tempBox);
+            tempBox.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempBox);
+
+            if(urlInput) {
+                showToast("엔트리 작품 주소 복사", "작성한 엔트리 공유 주소가 안전하게 복사되었습니다. 패들릿 게시판에 전송해 보세요!", "fa-clipboard-check", "bg-teal-500");
+            } else {
+                showToast("기본 주소 복사 완료", "엔트리 기본 주소가 복사되었습니다.", "fa-clipboard-check", "bg-teal-500");
+            }
+        }
+    </script>
+</body>
+</html>
