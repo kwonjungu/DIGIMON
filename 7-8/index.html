@@ -775,6 +775,48 @@ header.worksheet-header h1{font-size:clamp(30px,3vw,34px);text-wrap:balance;word
 .tab-btn small{font-family:var(--f-body,'IBM Plex Sans KR',sans-serif);font-size:13px;font-weight:500;color:var(--muted);opacity:1}
 .tab-btn.active small{color:inherit}
 .tab-btn[data-tab="1"] i{color:var(--a1)}.tab-btn[data-tab="2"] i{color:var(--a2)}.tab-btn[data-tab="3"] i{color:var(--a3)}
+
+/* 소리 AI 실험실 */
+.sc-lab{margin-top:28px;border:2px solid var(--a4-soft);background:linear-gradient(180deg,var(--a4-soft),var(--surface) 140px);border-radius:20px;padding:20px}
+.sc-noise{border-color:var(--a3-soft);background:linear-gradient(180deg,var(--a3-soft),var(--surface) 140px);margin:0 0 24px}
+.sc-title{margin:0 0 6px;font-size:1.3rem;color:var(--ink)}
+.sc-lead{margin:0 0 16px;color:var(--ink);font-size:.95rem}
+.sc-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:20px}
+.sc-col{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
+.sc-step{margin:6px 0 10px;font-weight:700;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sc-step b{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--a4);color:#fff;font-size:14px}
+.sc-step span{font-weight:400;color:var(--muted);font-size:.85rem}
+.sc-row{display:grid;grid-template-columns:150px 1fr 44px;gap:4px 10px;align-items:center;margin-bottom:10px}
+.sc-row small{grid-column:1 / -1;color:var(--muted);font-size:.8rem;margin-top:-2px}
+.sc-rec{min-height:44px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);font-weight:700;cursor:pointer;font-family:inherit}
+.sc-rec.rec{background:var(--a2);color:#fff;border-color:var(--a2);animation:scpulse .6s infinite alternate}
+@keyframes scpulse{to{transform:scale(1.04)}}
+.sc-meter{height:12px;background:var(--sunken);border-radius:999px;overflow:hidden}
+.sc-meter span{display:block;height:100%;width:0;background:var(--a1);border-radius:999px;transition:width .2s}
+.sc-train{margin:10px 0 6px}.sc-train span{background:var(--a4)}
+.sc-row2{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.sc-main{min-height:48px;padding:0 18px;border-radius:12px;border:0;background:var(--a4);color:#fff;font-weight:700;font-size:1rem;cursor:pointer;font-family:inherit}
+.sc-main:disabled{opacity:.45;cursor:not-allowed}
+.sc-main[aria-pressed="true"]{background:var(--a2)}
+.sc-line{min-height:44px;padding:0 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);font-weight:700;cursor:pointer;font-family:inherit}
+.sc-status{margin:4px 0 0;font-size:.88rem;color:var(--ink);min-height:1.4em}
+.sc-stage{position:relative;height:120px;margin:14px 0 8px;border-radius:14px;background:repeating-linear-gradient(90deg,#eef6f3 0 40px,#e3efe9 40px 80px);border:1px solid var(--line);overflow:hidden}
+.sc-stage img{position:absolute;bottom:6px;left:50%;width:84px;transform:translateX(-50%);transition:left .35s cubic-bezier(.3,1.4,.6,1)}
+.sc-stage img.hop{animation:schop .35s}
+@keyframes schop{50%{bottom:24px}}
+.sc-flag{position:absolute;top:8px;font-weight:700;font-size:.85rem;background:var(--surface);border-radius:999px;padding:2px 10px;border:1px solid var(--line)}
+.sc-flag-b{left:8px}.sc-flag-f{right:8px}
+.sc-heard-line{margin:6px 0 10px}
+.sc-score{display:grid;grid-template-columns:72px 1fr 44px;gap:8px;align-items:center;margin-bottom:6px;font-size:.88rem}
+.nz-meter{position:relative;height:22px;border-radius:999px;margin:12px 0 6px;background:linear-gradient(90deg,#d1fae5,#fef3c7 50%,#fee2e2);overflow:hidden;border:1px solid var(--line)}
+.nz-meter span{position:absolute;inset:0 auto 0 0;width:0;background:linear-gradient(90deg,#10b981,#f59e0b 50%,#ef4444);opacity:.85}
+.nz-meter i{position:absolute;top:0;bottom:0;width:3px;background:var(--ink);left:0}
+.nz-vol{display:inline-flex;align-items:center;gap:6px;font-size:.88rem}
+.sc-log{font-size:.88rem;color:var(--muted);margin:0 0 8px}
+.sc-tip{font-size:.85rem;background:var(--warn-soft,#fff1d6);border-radius:10px;padding:8px 10px;margin:0}
+@media (max-width:860px){.sc-grid{grid-template-columns:1fr}}
+@media (max-width:620px){.sc-row{grid-template-columns:1fr 44px}.sc-row .sc-rec{grid-column:1 / -1}}
+.nz-vol{min-height:44px}.nz-vol input{height:44px;width:140px}
 </style>
 </head>
 <body>
@@ -915,6 +957,49 @@ header.worksheet-header h1{font-size:clamp(30px,3vw,34px);text-wrap:balance;word
                 학습을 마친 뒤 코딩 창으로 돌아와 <strong>[인공지능] ➡️ [인공지능 블록 불러오기] ➡️ [오디오 감지]</strong> 블록을 함께 조립하여 활용해 보세요!
             </div>
 
+
+            <!-- 진짜 소리 AI 실험실 (티처블 머신 오디오 경량판) -->
+            <div class="sc-lab" id="sc-lab">
+                <h3 class="sc-title">🎙️ 진짜 소리 AI 실험실</h3>
+                <p class="sc-lead">엔트리에서 하기 전에 여기서 먼저 해 봐요. 내 목소리를 녹음해 학습시키면, 이 컴퓨터 안의 인공지능이 “앞”과 “뒤”를 알아듣고 강아지를 움직여요. 녹음은 어디에도 올라가지 않아요.</p>
+                <div class="sc-grid">
+                    <div class="sc-col">
+                        <p class="sc-step"><b>1</b> 소리 모으기 <span>(한 번 누르면 1초 녹음, 각각 8번 넘게)</span></p>
+                        <div class="sc-row">
+                            <button type="button" id="sc-rec-0" class="sc-rec" onclick="scRecord(0)">🎙️ 배경 소음 녹음</button>
+                            <div class="sc-meter"><span id="sc-bar-0"></span></div>
+                            <b id="sc-n-0">0번</b>
+                            <small>아무 말도 하지 않고 교실 소리만 녹음해요</small>
+                        </div>
+                        <div class="sc-row">
+                            <button type="button" id="sc-rec-1" class="sc-rec" onclick="scRecord(1)">🎙️ 앞 녹음</button>
+                            <div class="sc-meter"><span id="sc-bar-1"></span></div>
+                            <b id="sc-n-1">0번</b>
+                            <small>“앞” 또는 “앞으로”를 또렷하게 말해요</small>
+                        </div>
+                        <div class="sc-row">
+                            <button type="button" id="sc-rec-2" class="sc-rec" onclick="scRecord(2)">🎙️ 뒤 녹음</button>
+                            <div class="sc-meter"><span id="sc-bar-2"></span></div>
+                            <b id="sc-n-2">0번</b>
+                            <small>“뒤” 또는 “뒤로”를 또렷하게 말해요</small>
+                        </div>
+                        <p class="sc-step"><b>2</b> 학습하기</p>
+                        <div class="sc-row2"><button type="button" id="sc-train" class="sc-main" onclick="scTrain()" disabled>🧠 학습하기</button><button type="button" class="sc-line" onclick="scReset()">녹음 모두 지우기</button></div>
+                        <div class="sc-meter sc-train"><span id="sc-train-bar"></span></div>
+                        <p class="sc-status" id="sc-status" role="status">녹음 버튼을 누르면 소리 AI를 불러와요.</p>
+                    </div>
+                    <div class="sc-col">
+                        <p class="sc-step"><b>3</b> 말해서 움직이기</p>
+                        <button type="button" id="sc-listen" class="sc-main" aria-pressed="false" onclick="scListen()">👂 듣기 시작</button>
+                        <div class="sc-stage" aria-hidden="true"><span class="sc-flag sc-flag-b">뒤</span><span class="sc-flag sc-flag-f">앞</span><img id="sc-pet" src="../3-4/assets/mascot.webp" alt=""></div>
+                        <p class="sc-heard-line">알아들은 말: <b id="sc-heard">아직 없어요</b></p>
+                        <div class="sc-score"><span>배경 소음</span><div class="sc-meter"><span id="sc-score-0"></span></div><b id="sc-pct-0">0%</b></div>
+                        <div class="sc-score"><span>앞</span><div class="sc-meter"><span id="sc-score-1"></span></div><b id="sc-pct-1">0%</b></div>
+                        <div class="sc-score"><span>뒤</span><div class="sc-meter"><span id="sc-score-2"></span></div><b id="sc-pct-2">0%</b></div>
+                    </div>
+                </div>
+            </div>
+
             <!-- '앞'과 '뒤' 유사어 입력 그리드 영역 -->
             <p style="font-weight: bold; margin-bottom: 5px; margin-top: 30px; font-size: 1.1rem; color: #1e293b;">📢 말하고 듣는 AI의 유연성 키우기 (유사 단어 설계)</p>
             <p style="font-size: 0.95rem; color: #475569; margin-top: 0; margin-bottom: 15px;">
@@ -1013,6 +1098,30 @@ header.worksheet-header h1{font-size:clamp(30px,3vw,34px);text-wrap:balance;word
                 <h2>시끄러운 소음 속 AI의 오류를 발견해요</h2>
                 </div>
                 <img class="phead-art" src="assets/act3-noise.webp" alt="" aria-hidden="true" width="600" height="400" loading="lazy">
+            </div>
+
+
+            <!-- 진짜 소음 실험 -->
+            <div class="sc-lab sc-noise">
+                <h3 class="sc-title">🔊 진짜 소음 실험</h3>
+                <p class="sc-lead">교실이 얼마나 시끄러운지 재 보고, 소음을 틀어 놓은 채 활동 1에서 학습시킨 소리 AI가 “앞”, “뒤”를 잘 알아듣는지 시험해 봐요.</p>
+                <div class="sc-grid">
+                    <div class="sc-col">
+                        <p class="sc-step"><b>1</b> 교실 소음 재기</p>
+                        <button type="button" id="nz-meter-btn" class="sc-main" onclick="scMeter()">🎚️ 소음 측정 시작</button>
+                        <div class="nz-meter"><span id="nz-bar"></span><i id="nz-peak"></i></div>
+                        <p class="sc-heard-line">소음 크기 <b id="nz-val">0</b> · <b id="nz-word">측정 전</b></p>
+                        <p class="sc-step"><b>2</b> 소음 틀기</p>
+                        <div class="sc-row2"><button type="button" id="nz-play-btn" class="sc-line" onclick="scNoise()">🔊 교실 소음 틀기</button><label class="nz-vol">크기 <input type="range" id="nz-vol" min="0" max="1" step="0.05" value="0.4" oninput="scVol(this.value)"></label></div>
+                    </div>
+                    <div class="sc-col">
+                        <p class="sc-step"><b>3</b> 소음 속에서 말해 보기</p>
+                        <button type="button" id="sc-mini-listen" class="sc-main" aria-pressed="false" onclick="scListen()">👂 듣기 시작</button>
+                        <p class="sc-heard-line">알아들은 말: <b id="sc-mini-heard">아직 없어요</b></p>
+                        <p class="sc-log">최근 기록: <span id="sc-mini-log">-</span></p>
+                        <p class="sc-tip">조용할 때와 소음을 틀었을 때를 비교해 봐요. 말하지 않았는데 움직인 횟수와, 말했는데 못 알아들은 횟수를 세어 봐요.</p>
+                    </div>
+                </div>
             </div>
 
             <p style="font-weight: bold; margin-bottom: 5px;">🔊 교실 소음 상황에서 음성 인식을 시도했을 때, 인식이 잘 됐나요?</p>
@@ -1216,5 +1325,6 @@ header.worksheet-header h1{font-size:clamp(30px,3vw,34px);text-wrap:balance;word
     }
 </script>
 
+<script src="sc/sc-lite.js"></script>
 </body>
 </html>

@@ -424,6 +424,29 @@ label.lb{display:block;font-weight:700;font-size:15px;margin-bottom:6px}
 :root body h1{color:var(--ink)}
 .lessonbar .soon,.lessonbar .pg,.lessonbar .pend{padding:0 14px;border:0;background:none;color:var(--muted)}
 .lessonbar span.now{cursor:default}
+
+/* 진짜 AI: 그림 맞히기, 손가락 그리기 */
+.ai-guess{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+.ai-wait{margin:0;font-size:14px;color:var(--muted)}
+.ai-top{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.ai-top li{display:grid;grid-template-columns:96px 1fr 48px;gap:8px;align-items:center;font-size:15px}
+.ai-top li span{font-weight:700}
+.ai-top li i{display:block;height:12px;border-radius:999px;background:var(--a2);min-width:2px}
+.ai-top li:first-child i{background:var(--a2)}.ai-top li:not(:first-child) i{background:var(--a2-soft)}
+.ai-top li b{text-align:right}
+.ai-hint{margin:6px 0 0;font-size:14px;background:var(--warn-soft);border-radius:10px;padding:8px 10px}
+.hd-card .lead{margin-bottom:14px}
+.hd-wrap{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;align-items:start}
+.hd-stage{position:relative;aspect-ratio:4/3;border-radius:14px;overflow:hidden;background:#20303a}
+.hd-stage video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1);opacity:.55}
+.hd-stage canvas{position:absolute;inset:0;width:100%;height:100%}
+#hd-pet{position:absolute;left:0;top:0;width:56px;height:56px;opacity:0;transition:opacity .2s;pointer-events:none;filter:drop-shadow(0 2px 4px rgba(0,0,0,.4))}
+.hd-xy{position:absolute;left:8px;top:8px;background:rgba(255,255,255,.9);border-radius:999px;padding:2px 10px;font-size:13px;font-weight:700;color:#1D2B36}
+.hd-side{display:flex;flex-direction:column;gap:10px}
+.hd-colors{display:flex;gap:8px}
+.hd-colors button{width:44px;height:44px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1.5px var(--line);cursor:pointer}
+.hd-colors button[aria-pressed="true"]{box-shadow:0 0 0 3px var(--ink)}
+@media (max-width:860px){.hd-wrap{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -612,6 +635,10 @@ label.lb{display:block;font-weight:700;font-size:15px;margin-bottom:6px}
           <p class="lb"><span class="who b">B</span>프롬프트만 보고 그리기</p>
           <div class="tools" id="tools"></div>
           <div class="board"><canvas id="paint" aria-label="그림판"></canvas></div>
+          <div class="ai-guess">
+            <button type="button" id="ai-guess-btn" class="btn line" onclick="aiGuessDrawing()">🤖 AI야, 무슨 그림인지 맞혀 봐!</button>
+            <div id="ai-guess-out" aria-live="polite"><p class="ai-wait">B가 다 그리면 눌러 봐요. 구글 ‘Quick, Draw!’ 낙서 그림으로 배운 AI가 345가지 가운데에서 맞혀요.</p></div>
+          </div>
         </div>
       </div>
     </div>
@@ -696,6 +723,32 @@ label.lb{display:block;font-weight:700;font-size:15px;margin-bottom:6px}
           <li><b>0.01초 기다리기</b>: 움직임이 부드러워지고 컴퓨터가 덜 힘들어요.</li>
         </ul>
         <p class="small" style="margin-top:12px;color:#C5D1DA">손 인식은 크롬이나 웨일에서 잘 돼요. 손이 화면에 다 보이도록 카메라에서 조금 떨어져 앉아요.</p>
+      </div>
+    </div>
+
+    <div class="card hd-card">
+      <h3><span class="step-no">미리</span>엔트리 전에 진짜 손 인식으로 그려 보기</h3>
+      <p class="lead">엔트리의 손 인식 블록과 같은 AI예요. 카메라가 손가락 마디 21곳을 찾고, 그중 <b>검지 끝의 x, y 좌표</b>를 강아지가 따라가며 선을 그려요. 영상은 이 컴퓨터 밖으로 나가지 않아요.</p>
+      <div class="hd-wrap">
+        <div class="hd-stage" id="hd-stage">
+          <video id="hd-video" playsinline muted></video>
+          <canvas id="hd-ink" aria-label="손가락으로 그린 그림"></canvas>
+          <img id="hd-pet" src="assets/mascot.webp" alt="" aria-hidden="true">
+          <span class="hd-xy" id="hd-xy">x 0, y 0</span>
+        </div>
+        <div class="hd-side">
+          <button type="button" id="hd-start" class="btn main" aria-pressed="false" onclick="hdStart()">📷 카메라 켜고 그리기</button>
+          <p class="small" id="hd-status" role="status">검지만 펴면 그려지고, 주먹을 쥐면 멈춰요.</p>
+          <div class="hd-colors" role="group" aria-label="붓 색">
+            <button type="button" aria-pressed="true" aria-label="빨강" style="background:#E2525B" onclick="hdColor('#E2525B',this)"></button>
+            <button type="button" aria-pressed="false" aria-label="주황" style="background:#D98806" onclick="hdColor('#D98806',this)"></button>
+            <button type="button" aria-pressed="false" aria-label="초록" style="background:#0B8F78" onclick="hdColor('#0B8F78',this)"></button>
+            <button type="button" aria-pressed="false" aria-label="파랑" style="background:#4B6BD6" onclick="hdColor('#4B6BD6',this)"></button>
+            <button type="button" aria-pressed="false" aria-label="검정" style="background:#1D2B36" onclick="hdColor('#1D2B36',this)"></button>
+          </div>
+          <div class="row"><button type="button" class="btn ghost" onclick="hdClear()">지우기</button><button type="button" class="btn line" onclick="hdSave()">그림 저장</button></div>
+          <p class="small muted">화면 왼쪽 위 숫자가 검지 끝의 좌표예요. 엔트리 무대처럼 가운데가 x 0, y 0이고, 오른쪽 끝이 x 240, 위쪽 끝이 y 135예요.</p>
+        </div>
       </div>
     </div>
 
@@ -1094,5 +1147,6 @@ const h=(location.hash||'').slice(1);openTab(['act1','act2','act3','wrap'].inclu
 })();
 </script>
 
+<script src="ai/ai34.js"></script>
 </body>
 </html>

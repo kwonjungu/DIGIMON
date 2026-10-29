@@ -145,6 +145,57 @@
 .lessonbar .soon,.lessonbar .pg,.lessonbar .pend{padding:0 14px;border:0;background:none;color:var(--muted)}
 .lessonbar span.now{cursor:default}
 .step-btn.active{transform:none}
+
+/* 나도 어린이 통계청 */
+.chartlab{background:linear-gradient(180deg,var(--a4-soft),var(--surface) 160px);border:2px solid var(--a4-soft);border-radius:22px;padding:20px;margin-bottom:24px}
+.cl-kicker{margin:0;font-weight:700;color:var(--a4-ink);font-size:14px}
+.cl-h{margin:2px 0 6px;font-family:var(--f-display,'Jua');font-size:24px;color:var(--ink)}
+.cl-lead{margin:0 0 14px;color:var(--ink);font-size:15px}
+.cl-start{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.cl-start button,.cl-types button,.cl-actions button{min-height:44px;padding:0 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);font-weight:700;font-size:14px;cursor:pointer;color:var(--ink)}
+.cl-start button:hover,.cl-types button:hover{border-color:var(--a4)}
+.cl-types{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.cl-types button[aria-pressed="true"]{background:var(--a4);border-color:var(--a4);color:#fff}
+.cl-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:16px}
+.cl-panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;min-width:0}
+.cl-step{margin:4px 0 10px;font-weight:700;display:flex;align-items:center;gap:8px}
+.cl-step b{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--a4);color:#fff;font-size:14px}
+.cl-field{display:block;font-size:13px;font-weight:700;color:var(--muted);margin-bottom:10px}
+.cl-field input,.cl-field textarea{display:block;width:100%;margin-top:4px;min-height:44px;padding:8px 10px;border:1.5px solid var(--line);border-radius:10px;font-size:15px;font-weight:400;color:var(--ink);box-sizing:border-box;font-family:inherit}
+.cl-two{display:grid;grid-template-columns:1fr 1.6fr;gap:8px}
+.cl-thead{display:grid;grid-template-columns:48px 1fr 150px 44px;gap:6px;font-size:12px;color:var(--muted);font-weight:700;padding:0 2px 4px}
+.cl-row{display:grid;grid-template-columns:48px 1fr 44px 58px 44px 44px;gap:6px;margin-bottom:6px;align-items:center}
+.cl-row input{min-height:44px;border:1.5px solid var(--line);border-radius:10px;padding:0 8px;font-size:15px;min-width:0;box-sizing:border-box;font-family:inherit}
+.cl-emo{text-align:center;font-size:20px!important;padding:0!important}
+.cl-val{text-align:center;padding:0 4px!important}
+.cl-row .cl-pm{display:grid;place-items:center;min-height:44px;border-radius:10px;border:1.5px solid var(--line);background:var(--sunken);font-size:20px;font-weight:700;cursor:pointer}
+.cl-row .cl-plus{background:var(--a4);border-color:var(--a4);color:#fff}
+.cl-row .cl-plus.pop{animation:clpop .25s}
+@keyframes clpop{50%{transform:scale(1.15)}}
+.cl-del{min-height:44px;border:0;background:none;color:var(--muted);font-size:20px;cursor:pointer;border-radius:10px}
+.cl-del:hover{background:var(--bad-soft,#fce3e1);color:var(--bad,#d9443b)}
+.cl-actions{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 14px}
+.cl-out{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px}
+.cl-out-title{margin:0 0 8px;text-align:center;font-family:var(--f-display,'Jua');font-size:20px;color:#1D2B36}
+.cl-canvas{position:relative;height:300px}
+.cl-out-source{margin:8px 0 0;font-size:12px;color:#5B6E7B;text-align:right}
+.cl-pict{display:flex;flex-direction:column;gap:8px;min-height:200px}
+.cl-pline{display:grid;grid-template-columns:120px 1fr 64px;gap:8px;align-items:center;border-bottom:1px dashed var(--line);padding-bottom:6px}
+.cl-plabel{font-weight:700;font-size:15px}
+.cl-picons{font-size:24px;letter-spacing:2px;line-height:1.3;word-break:break-all}
+.cl-picons i{font-style:normal;color:var(--muted);font-size:14px}
+.cl-half{display:inline-block;width:.55em;overflow:hidden;vertical-align:bottom}
+.cl-pline b{text-align:right}
+.cl-plegend{margin:4px 0 0;font-size:13px;color:#5B6E7B;text-align:right}
+.cl-facts{margin:12px 0;padding:12px 14px 12px 32px;background:var(--warn-soft,#fff1d6);border-radius:12px;font-size:15px;line-height:1.7}
+.cl-save{width:100%;min-height:48px;border:0;border-radius:12px;background:var(--a1);color:#fff;font-weight:700;font-size:15px;cursor:pointer}
+@media (max-width:860px){.cl-grid{grid-template-columns:1fr}}
+@media (max-width:480px){.cl-thead{display:none}.cl-row{grid-template-columns:44px 1fr 44px;grid-template-areas:'e n d' 'm v p'}.cl-emo{grid-area:e}.cl-name{grid-area:n}.cl-del{grid-area:d}.cl-row .cl-pm:not(.cl-plus){grid-area:m}.cl-val{grid-area:v}.cl-plus{grid-area:p}.cl-row{padding-bottom:6px;border-bottom:1px dashed var(--line)}.cl-pline{grid-template-columns:90px 1fr 52px}.cl-two{grid-template-columns:1fr}}
+.cl-types button{min-width:44px}
+.cl-file{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;border-radius:12px;border:1.5px dashed var(--a4);background:var(--surface);font-weight:700;font-size:14px;cursor:pointer;color:var(--a4-ink)}
+.cl-file input{position:absolute;width:1px;height:1px;opacity:0}
+.cl-file:focus-within{outline:3px solid var(--a4)}
+.cl-colpick select{display:block;width:100%;margin-top:4px;min-height:44px;border:1.5px solid var(--line);border-radius:10px;padding:0 8px;font-size:15px}
 </style>
 </head>
 <body class="text-gray-800 pb-20 p-4 md:p-8">
@@ -454,6 +505,67 @@
             </div>
         </div>
 
+        <!-- 나도 어린이 통계청: 우리 반 그래프 만들기 -->
+        <div class="chartlab" id="chartlab">
+            <div class="cl-head">
+                <div>
+                    <p class="cl-kicker">📊 나도 어린이 통계청</p>
+                    <h3 class="cl-h">우리 반 그래프를 직접 만들어 봐요</h3>
+                    <p class="cl-lead">조사 주제를 고르고, 손을 든 친구 수를 <b>+</b>로 세거나 통계 숫자를 넣으면 그래프가 바로 그려져요. 어떤 그래프가 가장 잘 보이는지 바꿔 가며 비교해 봐요.</p>
+                </div>
+            </div>
+            <div class="cl-start" role="group" aria-label="조사 주제 고르기">
+                <button type="button" data-cl-preset="wish">🙋 키우고 싶은 동물 손들기</button>
+                <button type="button" data-cl-preset="have">🏠 우리 반이 키우는 동물</button>
+                <button type="button" data-cl-preset="kosis">📈 국가통계 불러오기</button>
+                <button type="button" data-cl-preset="trend">🔍 검색 관심도 불러오기</button>
+                <button type="button" data-cl-preset="rescue">🐾 구조된 유기동물 수</button>
+                <button type="button" data-cl-preset="registered">📋 등록된 반려동물 수</button>
+                <label class="cl-file">📂 CSV 파일 불러오기<input type="file" id="cl-csv" accept=".csv,text/csv"></label>
+            </div>
+            <div class="cl-two"><label class="cl-field cl-colpick" id="cl-cat-wrap" hidden>분류 고르기<select id="cl-cat"></select></label>
+            <label class="cl-field cl-colpick" id="cl-col-wrap" hidden>그래프로 그릴 열 고르기<select id="cl-col"></select></label></div>
+            <div class="cl-grid">
+                <div class="cl-panel">
+                    <p class="cl-step"><b>1</b> 표 만들기</p>
+                    <label class="cl-field">그래프 제목<input id="cl-title" type="text"></label>
+                    <div class="cl-two">
+                        <label class="cl-field">단위<input id="cl-unit" type="text" placeholder="명, %, 마리"></label>
+                        <label class="cl-field">출처<input id="cl-source" type="text" placeholder="어디서 얻은 자료인가요?"></label>
+                    </div>
+                    <div class="cl-thead"><span>그림</span><span>항목</span><span>수</span></div>
+                    <div id="cl-rows"></div>
+                    <div class="cl-actions">
+                        <button type="button" id="cl-add">+ 항목 더하기</button>
+                        <button type="button" id="cl-zero">수 모두 0으로</button>
+                    </div>
+                    <p class="cl-step"><b>2</b> 그래프 고르기</p>
+                    <div class="cl-types" role="group" aria-label="그래프 종류">
+                        <button type="button" data-cl-type="bar">막대</button>
+                        <button type="button" data-cl-type="hbar">가로 막대</button>
+                        <button type="button" data-cl-type="pict">그림그래프</button>
+                        <button type="button" data-cl-type="line">꺾은선</button>
+                        <button type="button" data-cl-type="pie">원</button>
+                    </div>
+                    <div class="cl-two" id="cl-per-wrap" hidden>
+                        <label class="cl-field">그림 모양<input id="cl-icon" type="text" maxlength="4"></label>
+                        <label class="cl-field">그림 하나가 나타내는 수<input id="cl-per" type="number" min="0.1" step="any"></label>
+                    </div>
+                </div>
+                <div class="cl-panel">
+                    <p class="cl-step"><b>3</b> 완성된 그래프</p>
+                    <div id="cl-out" class="cl-out">
+                        <p id="cl-out-title" class="cl-out-title"></p>
+                        <div id="cl-canvas-wrap" class="cl-canvas"><canvas id="cl-canvas" aria-label="만든 그래프"></canvas></div>
+                        <div id="cl-pict" class="cl-pict" hidden></div>
+                        <p id="cl-out-source" class="cl-out-source"></p>
+                    </div>
+                    <ul id="cl-facts" class="cl-facts" aria-live="polite"></ul>
+                    <label class="cl-field">그래프를 보고 알게 된 점<textarea id="cl-note" rows="3" placeholder="예) 우리 반은 강아지를 키우고 싶은 친구가 가장 많지만, 나라 전체 통계와 비교하면..."></textarea></label>
+                    <button type="button" id="cl-save" class="cl-save"><i class="fa-solid fa-download mr-1"></i>그래프 사진으로 저장</button>
+                </div>
+            </div>
+        </div>
         <!-- (4) 내가 좋아하는 동물 -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="bg-amber-50 rounded-2xl p-4 border border-amber-100">
@@ -641,5 +753,6 @@ async function shareCopyImage(id){
     }
 }
 </script>
+<script src="chartlab.js"></script>
 </body>
 </html>

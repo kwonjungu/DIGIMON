@@ -127,6 +127,31 @@ input[type=text],input:not([type]){min-height:44px}
 :root body h1{color:var(--ink)}
 .lessonbar .soon,.lessonbar .pg,.lessonbar .pend{padding:0 14px;border:0;background:none;color:var(--muted)}
 .lessonbar span.now{cursor:default}
+
+/* 먹이 분류 AI(티처블 머신 경량판) */
+.tm-intro{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;background:var(--a4-soft);border-radius:16px;padding:14px 16px;margin-bottom:16px}
+.tm-intro p{margin:0;font-size:14px;color:var(--ink);flex:1 1 320px}
+.tm-intro-btns{display:flex;gap:8px;flex-wrap:wrap}
+.tm-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 14px;border-radius:12px;font-size:13px;font-weight:700;border:1.5px solid transparent;cursor:pointer;touch-action:none;user-select:none}
+.tm-teal{background:var(--a1);color:#fff}.tm-rose{background:var(--a2);color:#fff}.tm-indigo{background:#4f46e5;color:#fff}
+.tm-line{background:var(--surface);border-color:var(--line);color:var(--ink)}
+.tm-btn:active{transform:translateY(1px)}
+.tm-add{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tm-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:6px;max-height:200px;overflow:auto;margin-bottom:10px;padding:2px}
+.tm-cell{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:#fff}
+.tm-pick{display:block;width:100%;height:100%;padding:0;border:0;background:none;cursor:pointer}
+.tm-pick img{width:100%;height:100%;object-fit:cover;display:block}
+.tm-del{position:absolute;inset:auto 0 0 0;min-height:44px;border:0;background:rgba(217,68,59,.92);color:#fff;font-weight:700;font-size:13px;cursor:pointer;display:none}
+.tm-cell.sel{outline:3px solid var(--bad,#d9443b);outline-offset:-3px}.tm-cell.sel .tm-del{display:block}
+.tm-cam{display:grid;grid-template-columns:240px 1fr;gap:16px;align-items:center;background:var(--surface);border:2px solid #c7d2fe;border-radius:16px;padding:12px;margin-bottom:16px}
+.tm-cam video{width:240px;height:240px;object-fit:cover;border-radius:12px;background:#111;transform:scaleX(-1)}
+.tm-cam-tip{font-size:14px;margin:0 0 10px;color:var(--ink)}
+.tm-live{width:100%;margin-bottom:8px}.tm-live[aria-pressed="true"]{background:var(--a2)}
+.tm-preview{width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+@media (max-width:620px){.tm-cam{grid-template-columns:1fr}.tm-cam video{width:100%;height:auto;aspect-ratio:1}}
+button[onclick^="selectTestFood"],#custom-test-btn{min-height:44px}
+.tm-intro p small{display:block;color:var(--muted)}
+.tm-gtip{margin:-4px 0 8px;font-size:12px;color:var(--muted)}
 </style>
 </head>
 <body class="text-slate-800 antialiased min-h-screen pb-12">
@@ -281,6 +306,22 @@ input[type=text],input:not([type]){min-height:44px}
         <img class="phead-art" src="assets/act2-train.webp" alt="" aria-hidden="true" width="900" height="600" loading="lazy">
       </div>
 
+      <!-- 웹캠 상자 (티처블 머신 경량판) -->
+      <div class="tm-intro">
+        <p><b>진짜 AI를 학습시켜요.</b> 클래스마다 사진을 모으고 학습시키면, 이 컴퓨터 안에서 인공지능이 직접 배워요. 사진은 어디에도 올라가지 않아요.</p>
+        <div class="tm-intro-btns">
+          <button type="button" onclick="tmCamOn()" class="tm-btn tm-indigo"><i class="fa-solid fa-video"></i> 웹캠 켜기</button>
+          <button type="button" onclick="tmReseed()" class="tm-btn tm-line"><i class="fa-solid fa-rotate-left"></i> 예시 사진으로 되돌리기</button>
+        </div>
+      </div>
+      <div id="tm-cam" class="tm-cam" hidden>
+        <video id="tm-video" playsinline muted></video>
+        <div>
+          <p class="tm-cam-tip">음식(또는 음식 사진)을 카메라에 비추고, 아래 클래스 칸의 <b>웹캠 촬영</b> 버튼을 누르고 있으면 사진이 계속 담겨요. 각도와 거리를 바꿔 가며 20장 넘게 모아 봐요.</p>
+          <button type="button" onclick="tmCamOff()" class="tm-btn tm-line"><i class="fa-solid fa-video-slash"></i> 웹캠 끄기</button>
+        </div>
+      </div>
+
       <!-- ① 데이터셋 탑색 / 이미지 카드 업로드 -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <!-- 왼쪽: 클래스 1 (안전) 학습 데이터 설정 -->
@@ -293,28 +334,12 @@ input[type=text],input:not([type]){min-height:44px}
           </div>
 
           <!-- 샘플 학습 데이터 카드 그리드 -->
-          <div class="grid grid-cols-4 gap-2 mb-3" id="c1-gallery">
-            <div class="aspect-square bg-white border border-slate-200 rounded-lg p-1 relative flex flex-col items-center justify-center">
-              <span class="text-xl">🥩</span>
-              <span class="text-[9px] text-slate-500 font-semibold mt-1">고기</span>
-            </div>
-            <div class="aspect-square bg-white border border-slate-200 rounded-lg p-1 relative flex flex-col items-center justify-center">
-              <span class="text-xl">🥕</span>
-              <span class="text-[9px] text-slate-500 font-semibold mt-1">당근</span>
-            </div>
-            <div class="aspect-square bg-white border border-slate-200 rounded-lg p-1 relative flex flex-col items-center justify-center">
-              <span class="text-xl">🍎</span>
-              <span class="text-[9px] text-slate-500 font-semibold mt-1">사과</span>
-            </div>
-            <div class="aspect-square bg-white border border-slate-200 rounded-lg p-1 relative flex flex-col items-center justify-center">
-              <span class="text-xl">🥬</span>
-              <span class="text-[9px] text-slate-500 font-semibold mt-1">채소</span>
-            </div>
-          </div>
+          <div class="tm-gallery" id="c1-gallery"></div>
+          <p class="tm-gtip">사진을 누르면 뺄 수 있어요.</p>
           <!-- 학습 데이터 직접 추가 기능 -->
-          <div class="flex gap-1.5">
-            <input type="text" id="c1-add-input" placeholder="새로운 안전 음식 입력 (예: 단호박)" class="flex-1 p-1.5 text-xs rounded border border-slate-300 focus:outline-none">
-            <button onclick="addTrainingData(1)" class="bg-teal-600 hover:bg-teal-700 text-white text-xs px-3 py-1.5 rounded font-bold">추가</button>
+          <div class="tm-add">
+            <button type="button" id="tm-cap-1" class="tm-btn tm-teal" title="웹캠을 켠 뒤 누르고 있으면 계속 찍혀요"><i class="fa-solid fa-camera"></i> 누르고 있으면 웹캠 촬영</button>
+            <button type="button" onclick="tmUpload(1)" class="tm-btn tm-line"><i class="fa-solid fa-image"></i> 사진 올리기</button>
           </div>
         </div>
 
@@ -328,28 +353,12 @@ input[type=text],input:not([type]){min-height:44px}
           </div>
 
           <!-- 샘플 학습 데이터 카드 그리드 -->
-          <div class="grid grid-cols-4 gap-2 mb-3" id="c2-gallery">
-            <div class="aspect-square bg-white border border-slate-200 rounded-lg p-1 relative flex flex-col items-center justify-center">
-              <span class="text-xl">🍫</span>
-              <span class="text-[9px] text-slate-500 font-semibold mt-1">초콜릿</span>
-            </div>
-            <div class="aspect-square bg-white border border-slate-200 rounded-lg p-1 relative flex flex-col items-center justify-center">
-              <span class="text-xl">🍇</span>
-              <span class="text-[9px] text-slate-500 font-semibold mt-1">포도</span>
-            </div>
-            <div class="aspect-square bg-white border border-slate-200 rounded-lg p-1 relative flex flex-col items-center justify-center">
-              <span class="text-xl">🧅</span>
-              <span class="text-[9px] text-slate-500 font-semibold mt-1">양파</span>
-            </div>
-            <div class="aspect-square bg-white border border-slate-200 rounded-lg p-1 relative flex flex-col items-center justify-center">
-              <span class="text-xl">☕</span>
-              <span class="text-[9px] text-slate-500 font-semibold mt-1">커피</span>
-            </div>
-          </div>
+          <div class="tm-gallery" id="c2-gallery"></div>
+          <p class="tm-gtip">사진을 누르면 뺄 수 있어요.</p>
           <!-- 학습 데이터 직접 추가 기능 -->
-          <div class="flex gap-1.5">
-            <input type="text" id="c2-add-input" placeholder="새로운 위험 음식 입력 (예: 닭뼈)" class="flex-1 p-1.5 text-xs rounded border border-slate-300 focus:outline-none">
-            <button onclick="addTrainingData(2)" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5 rounded font-bold">추가</button>
+          <div class="tm-add">
+            <button type="button" id="tm-cap-2" class="tm-btn tm-rose" title="웹캠을 켠 뒤 누르고 있으면 계속 찍혀요"><i class="fa-solid fa-camera"></i> 누르고 있으면 웹캠 촬영</button>
+            <button type="button" onclick="tmUpload(2)" class="tm-btn tm-line"><i class="fa-solid fa-image"></i> 사진 올리기</button>
           </div>
         </div>
       </div>
@@ -382,19 +391,20 @@ input[type=text],input:not([type]){min-height:44px}
             <div class="bg-teal-50 text-teal-600 rounded-full w-10 h-10 flex items-center justify-center font-bold text-lg mb-2">2</div>
             <span class="font-bold text-sm mb-1">테스트할 음식 사진 제시</span>
             <p class="text-[11px] text-slate-500 mb-2">카메라에 보여줄 테스트 음식을 선택해 주세요.</p>
+            <button type="button" id="tm-live-btn" onclick="tmLiveTest()" aria-pressed="false" class="tm-btn tm-indigo tm-live"><i class="fa-solid fa-video"></i> 웹캠으로 실시간 판별</button>
             <div class="grid grid-cols-4 gap-1.5 mb-2 w-full">
-              <button onclick="selectTestFood('🍎', '사과')" class="bg-slate-50 border hover:bg-teal-50 hover:border-teal-300 text-lg p-1 rounded transition-all">🍎</button>
-              <button onclick="selectTestFood('🥩', '소고기')" class="bg-slate-50 border hover:bg-teal-50 hover:border-teal-300 text-lg p-1 rounded transition-all">🥩</button>
-              <button onclick="selectTestFood('🍫', '초콜릿')" class="bg-slate-50 border hover:bg-teal-50 hover:border-teal-300 text-lg p-1 rounded transition-all">🍫</button>
-              <button onclick="selectTestFood('🧅', '양파')" class="bg-slate-50 border hover:bg-teal-50 hover:border-teal-300 text-lg p-1 rounded transition-all">🧅</button>
+              <button onclick="selectTestFood('🍌', '바나나')" class="bg-slate-50 border hover:bg-teal-50 hover:border-teal-300 text-lg p-1 rounded transition-all">🍌</button>
+              <button onclick="selectTestFood('🐟', '익힌 생선')" class="bg-slate-50 border hover:bg-teal-50 hover:border-teal-300 text-lg p-1 rounded transition-all">🐟</button>
+              <button onclick="selectTestFood('🍬', '사탕')" class="bg-slate-50 border hover:bg-teal-50 hover:border-teal-300 text-lg p-1 rounded transition-all">🍬</button>
+              <button onclick="selectTestFood('🧄', '마늘')" class="bg-slate-50 border hover:bg-teal-50 hover:border-teal-300 text-lg p-1 rounded transition-all">🧄</button>
               <button onclick="selectTestFood('🥦', '브로콜리')" class="bg-slate-50 border hover:bg-teal-50 hover:border-teal-300 text-lg p-1 rounded transition-all">🥦</button>
               <button onclick="selectTestFood('🍕', '피자')" class="bg-slate-50 border hover:bg-teal-50 hover:border-teal-300 text-lg p-1 rounded transition-all">🍕</button>
-              <button onclick="selectTestFood('🍇', '포도')" class="bg-slate-50 border hover:bg-teal-50 hover:border-teal-300 text-lg p-1 rounded transition-all">🍇</button>
-              <button id="custom-test-btn" onclick="triggerCustomTest()" class="bg-slate-100 border text-xs font-bold p-1 rounded text-slate-600 flex items-center justify-center">직접</button>
+              <button id="custom-test-btn" onclick="triggerCustomTest()" class="bg-slate-100 border text-xs font-bold p-1 rounded text-slate-600 flex items-center justify-center">사진</button>
             </div>
             <div class="text-xs bg-slate-100 p-1.5 rounded w-full flex items-center justify-center gap-2">
-              <span id="test-food-emoji" class="text-lg">🍎</span>
-              <span id="test-food-name" class="font-bold text-slate-700">사과 (기본값)</span>
+              <img id="tm-test-preview" class="tm-preview" alt="시험할 사진" hidden>
+              <span id="test-food-emoji" class="text-lg">🍌</span>
+              <span id="test-food-name" class="font-bold text-slate-700">바나나 (기본값)</span>
             </div>
           </div>
 
@@ -425,6 +435,7 @@ input[type=text],input:not([type]){min-height:44px}
                   <div id="result-c2-bar" class="bg-rose-500 h-2 rounded-full transition-all" style="width: 0%"></div>
                 </div>
               </div>
+              <p id="result-note" class="hidden mt-3 text-[12px] leading-snug text-left text-slate-700 bg-amber-50 border border-amber-200 rounded-md p-2" role="status"></p>
             </div>
 
             <button onclick="runClassification()" class="w-full mt-2 bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold py-2 px-4 rounded-lg transition-all shadow-sm">
@@ -612,7 +623,7 @@ input[type=text],input:not([type]){min-height:44px}
       isTrained: false,
       c1Data: ['🥩 고기', '🥕 당근', '🍎 사과', '🥬 채소'],
       c2Data: ['🍫 초콜릿', '🍇 포도', '🧅 양파', '☕ 커피'],
-      currentTestFood: { emoji: '🍎', name: '사과' }
+      currentTestFood: { emoji: '🍌', name: '바나나' }
     };
 
     // 탭 전환 기능
@@ -777,15 +788,37 @@ input[type=text],input:not([type]){min-height:44px}
       let c1Percentage = 0;
       let c2Percentage = 0;
 
-      // 완전 자동 추론 판별 조건 (수집된 데이터셋 기반 우선 검색)
-      const isGoodFood = state.c1Data.some(item => item.includes(foodName)) || ['사과', '소고기', '고기', '당근', '채소', '브로콜리', '배추'].includes(foodName);
-      const isBadFood = state.c2Data.some(item => item.includes(foodName)) || ['초콜릿', '포도', '양파', '커피', '닭뼈', '피자', '콜라'].includes(foodName);
+      // 학습 데이터만 보고 판단한다 (정답 목록을 따로 두지 않음)
+      const inData = (list, word) => list.some(item => item.includes(word) || word.includes(item.split(' ').pop()));
+      const seenGood = inData(state.c1Data, foodName);
+      const seenBad = inData(state.c2Data, foodName);
+      // 처음 보는 음식은 '비슷하게 생긴' 학습 데이터가 있을 때만 어느 정도 짐작한다
+      const LOOKS_LIKE = { '바나나': '사과', '익힌 생선': '고기', '생선': '고기', '브로콜리': '채소', '마늘': '양파', '사탕': '초콜릿' };
+      const twin = LOOKS_LIKE[foodName];
+      const likeGood = !seenGood && !seenBad && twin && inData(state.c1Data, twin);
+      const likeBad = !seenGood && !seenBad && twin && inData(state.c2Data, twin);
+      const note = document.getElementById('result-note');
 
-      if (isGoodFood) {
+      if (seenGood || seenBad) {
+        note.textContent = '이 음식은 학습에 쓴 사진이에요. 이미 본 사진으로는 AI의 진짜 실력을 알 수 없어요. 처음 보는 음식으로 시험해 봐요.';
+      } else if (likeGood || likeBad) {
+        note.textContent = '처음 보는 음식이라 비슷하게 생긴 학습 사진을 보고 짐작했어요. 이 음식 사진을 학습 데이터에 더 넣으면 더 정확해져요.';
+      } else {
+        note.textContent = '처음 보는 음식이고 비슷한 학습 사진도 없어서 AI가 헷갈려해요. 학습 데이터를 더 다양하게 모아야 해요.';
+      }
+      note.classList.remove('hidden');
+
+      if (seenGood) {
         c1Percentage = Math.floor(Math.random() * 15) + 85; // 85~99%
         c2Percentage = 100 - c1Percentage;
-      } else if (isBadFood) {
+      } else if (seenBad) {
         c2Percentage = Math.floor(Math.random() * 15) + 85; // 85~99%
+        c1Percentage = 100 - c2Percentage;
+      } else if (likeGood) {
+        c1Percentage = Math.floor(Math.random() * 16) + 60; // 60~75%
+        c2Percentage = 100 - c1Percentage;
+      } else if (likeBad) {
+        c2Percentage = Math.floor(Math.random() * 16) + 60; // 60~75%
         c1Percentage = 100 - c2Percentage;
       } else {
         // 완전 낯선 단어일 때: 반반 확률의 모호한 분포
@@ -899,5 +932,6 @@ input[type=text],input:not([type]){min-height:44px}
       renderTrainingGalleries();
     };
   </script>
+  <script src="tm/tm-lite.js"></script>
 </body>
 </html>
