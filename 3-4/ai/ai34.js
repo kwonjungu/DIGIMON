@@ -11,7 +11,10 @@
     return new Promise((ok, no) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = no; document.head.appendChild(s); });
   }
   let tfReady = null;
-  const tfjs = () => (tfReady = tfReady || (window.tf ? Promise.resolve() : loadScript(BASE + '../../vendor/tf.min.js')));
+  // 그래픽 가속(WebGL)을 먼저 쓰고, 안 되면 CPU로 돈다(CPU면 손 인식이 많이 느리다)
+  const tfjs = () => (tfReady = tfReady || (window.tf ? Promise.resolve() : loadScript(BASE + '../../vendor/tf.min.js'))
+    .then(() => tf.setBackend('webgl').catch(() => false)).then(() => tf.ready()));
+  const SLOW_TIP = '이 컴퓨터는 그래픽 가속이 꺼져 있어 손 인식이 느릴 수 있어요. 크롬 설정 > 시스템 > ‘그래픽 가속 사용’을 켜 주세요.';
 
   // ---------- 1) AI 그림 맞히기 ----------
   const DN = { model: null, names: null, loading: null };
@@ -89,12 +92,18 @@
     say('손 인식 AI를 불러오는 중이에요...');
     try {
       await handReady();
-      HD.stream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480, facingMode: 'user' }, audio: false });
+      HD.stream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' }, audio: false });
     } catch (e) { console.error(e); say('카메라나 AI를 켤 수 없어요. 카메라 허용을 확인해 주세요.'); return; }
     const v = $('hd-video'); v.srcObject = HD.stream; await v.play();
-    const cv = $('hd-ink'); cv.width = 640; cv.height = 480;
-    HD.on = true; HD.last = null; $('hd-start').textContent = '⏹ 카메라 끄기'; $('hd-start').setAttribute('aria-pressed', 'true');
-    say('검지를 펴고 움직여 보세요. 주먹을 쥐면 붓이 멈춰요.');
+    // 카메라마다 실제 크기가 다르다(640×480, 1280×720 등). 그 크기 그대로 그림판과 화면 비율을 맞춘다
+    const W = v.videoWidth || 640, H = v.videoHeight || 480;
+    v.width = W; v.height = H; // 손 인식 라이브러리는 영상 크기를 이 속성에서 읽는다(비어 있으면 좌표가 NaN)
+    const cv = $('hd-ink'); cv.width = W; cv.height = H;
+    $('hd-stage').style.aspectRatio = W + ' / ' + H;
+    Object.assign(HD, { W, H, last: null, sm: null, miss: 0, on: true });
+    $('hd-start').textContent = '⏹ 카메라 끄기'; $('hd-start').setAttribute('aria-pressed', 'true');
+    HD.slow = tf.getBackend() !== 'webgl';
+    say(HD.slow ? SLOW_TIP : '검지를 펴고 움직여 보세요. 주먹을 쥐면 붓이 멈춰요.');
     loop();
   }
   function handStop() {
@@ -104,26 +113,39 @@
     $('hd-pet').style.opacity = 0;
     say('카메라를 껐어요. 다시 그리려면 카메라를 켜 주세요.');
   }
+  const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+  // 손을 기울여도 되도록 '손목에서 얼마나 멀리 뻗었나'로 판단한다
+  function isPointing(k) {
+    const w = k[0];
+    const indexOut = dist(w, k[8]) > dist(w, k[6]) * 1.12;
+    const middleIn = dist(w, k[12]) < dist(w, k[10]) * 1.08;
+    return indexOut && middleIn;
+  }
   async function loop() {
     if (!HD.on) return;
     const v = $('hd-video'), cv = $('hd-ink'), g = cv.getContext('2d'), pet = $('hd-pet'), stage = $('hd-stage');
+    if (v.readyState < 2) { HD.raf = requestAnimationFrame(loop); return; }
     let hands = [];
     try { hands = await HD.det.estimateHands(v, { flipHorizontal: true }); } catch (e) { console.error(e); }
     if (hands.length) {
-      const k = hands[0].keypoints;
-      const tip = k[8], pip = k[6], mid = k[12], midPip = k[10];
-      const pointing = tip.y < pip.y && !(mid.y < midPip.y - 10); // 검지만 펴면 그리기
-      const x = tip.x, y = tip.y;
-      const sx = stage.clientWidth / 640, sy = stage.clientHeight / 480;
+      const k = hands[0].keypoints, tip = k[8];
+      // 떨림을 줄이려고 위치를 부드럽게 따라간다
+      HD.sm = HD.sm ? { x: HD.sm.x * 0.45 + tip.x * 0.55, y: HD.sm.y * 0.45 + tip.y * 0.55 } : { x: tip.x, y: tip.y };
+      const { x, y } = HD.sm;
+      const sx = stage.clientWidth / HD.W, sy = stage.clientHeight / HD.H;
       pet.style.opacity = 1; pet.style.transform = `translate(${x * sx - 28}px, ${y * sy - 28}px)`;
       // 엔트리 무대 좌표(가로 -240~240, 세로 -135~135)로 바꿔 보여 준다
-      $('hd-xy').textContent = `x ${Math.round((x - 320) * 0.75)}, y ${Math.round((240 - y) * 0.5625)}`;
-      say('검지를 펴고 움직여 보세요. 주먹을 쥐면 붓이 멈춰요.');
-      if (pointing) {
-        if (HD.last) { g.strokeStyle = HD.color; g.lineWidth = 10; g.lineCap = 'round'; g.beginPath(); g.moveTo(HD.last.x, HD.last.y); g.lineTo(x, y); g.stroke(); }
+      $('hd-xy').textContent = `x ${Math.round((x - HD.W / 2) * (480 / HD.W))}, y ${Math.round((HD.H / 2 - y) * (270 / HD.H))}`;
+      if (isPointing(k)) {
+        HD.miss = 0;
+        say(HD.slow ? SLOW_TIP : '그리는 중이에요. 주먹을 쥐면 붓이 멈춰요.');
+        if (HD.last) { g.strokeStyle = HD.color; g.lineWidth = Math.max(6, HD.W / 70); g.lineCap = 'round'; g.lineJoin = 'round'; g.beginPath(); g.moveTo(HD.last.x, HD.last.y); g.lineTo(x, y); g.stroke(); }
         HD.last = { x, y };
-      } else HD.last = null;
-    } else { HD.last = null; pet.style.opacity = 0; say('손이 화면에 보이게 해 주세요.'); }
+      } else if (++HD.miss > 2) { HD.last = null; say('붓을 멈췄어요. 검지만 펴면 다시 그려요.'); }
+    } else {
+      // 한두 장면 놓친 것은 기다려 주고, 오래 안 보이면 멈춘다
+      if (++HD.miss > 4) { HD.last = null; HD.sm = null; pet.style.opacity = 0; say('손이 화면에 보이게 해 주세요.'); }
+    }
     HD.raf = requestAnimationFrame(loop);
   }
 
@@ -138,8 +160,8 @@
   window.hdClear = () => { const cv = $('hd-ink'); cv.getContext('2d').clearRect(0, 0, cv.width, cv.height); };
   window.hdColor = (c, btn) => { HD.color = c; document.querySelectorAll('.hd-colors button').forEach((b) => b.setAttribute('aria-pressed', String(b === btn))); };
   window.hdSave = () => {
-    const src = $('hd-ink'), c = document.createElement('canvas'); c.width = 640; c.height = 480;
-    const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, 640, 480); g.drawImage(src, 0, 0);
+    const src = $('hd-ink'), c = document.createElement('canvas'); c.width = src.width; c.height = src.height;
+    const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(src, 0, 0);
     const a = document.createElement('a'); a.download = '손가락그림.png'; a.href = c.toDataURL('image/png'); a.click();
   };
   // 다른 탭으로 가면 카메라를 끈다
