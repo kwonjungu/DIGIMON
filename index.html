@@ -1,14 +1,38 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" data-theme="light">
 <head>
     <meta charset="UTF-8">
+<meta name="color-scheme" content="light">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>디지몬(DIGIMON) · 데이터로 만나는 반려동물 사회</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="3-4/assets/mascot.webp" type="image/webp">
     <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jua&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family:'Jua',sans-serif; background-color:#ECFEFF; }
+        :root{--bg:#F2F6F8;--surface:#FFFFFF;--sunken:#E8EFF3;--line:#D5E0E6;--ink:#1D2B36;--muted:#5B6E7B;
+          --a1:#0B8F78;--a1-soft:#DDF3EE;--a1-ink:#06604F;--a2:#E2525B;--a2-soft:#FCE5E6;--a2-ink:#A8323A;
+          --a3:#D98806;--a3-soft:#FCEFD6;--a3-ink:#8E5700;--a4:#4B6BD6;--a4-soft:#E3E9FB;--a4-ink:#2E4AA8;
+          --f-display:"Jua","IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+          --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif}
+        body { font-family:var(--f-body); background-color:var(--bg); color:var(--ink); word-break:keep-all; overflow-wrap:break-word; padding:0 !important; }
+        h1,h2,h3,.badge { font-family:var(--f-display); font-weight:400 !important; }
+        :focus-visible{outline:3px solid var(--a4);outline-offset:2px}
+        .lessonbar{background:var(--surface);border-bottom:1px solid var(--line)}
+        .lessonbar .wrap{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:8px;padding:10px 16px;overflow-x:auto;scrollbar-width:none}
+        .lessonbar a,.lessonbar span{white-space:nowrap;font-size:14px;text-decoration:none;padding:6px 12px;border-radius:999px;color:var(--muted);min-height:32px;display:inline-flex;align-items:center}
+        .lessonbar a:hover{background:var(--sunken)}
+        .lessonbar .now{background:var(--ink);color:var(--surface);font-weight:700}
+        .lessonbar .home{font-weight:700;color:var(--ink)}
+        .page{padding:16px;padding-bottom:80px}
+        @media (min-width:768px){.page{padding:32px;padding-bottom:80px}}
+        .hero-img{display:block;width:100%;max-width:640px;height:auto;aspect-ratio:16/9;margin:0 auto 20px;border-radius:20px;object-fit:cover}
+        .thumb{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;border-radius:14px;margin-bottom:12px;background:var(--sunken)}
+        .card-hover .small-note{color:var(--muted)}
+        @media (max-width:480px){.hero-img{max-width:100%;border-radius:14px}}
         .card-hover { transition:transform .3s cubic-bezier(.175,.885,.32,1.275),box-shadow .3s; border:1px solid #E5E5E5; box-shadow:0 4px 12px rgba(0,0,0,.1),0 2px 6px rgba(0,0,0,.05); }
         .card-hover:hover { transform:translateY(-10px) rotate(-2deg); box-shadow:0 20px 40px rgba(0,0,0,.1); cursor:pointer; }
         @keyframes bounce-slow { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
@@ -17,16 +41,39 @@
         .float-anim { animation:float 3s ease-in-out infinite; }
         .badge { position:absolute; top:-10px; right:-10px; padding:4px 14px; border-radius:999px; font-size:.85rem; font-weight:bold; color:white; box-shadow:0 4px 10px rgba(0,0,0,.1); }
         @media print { body{background:white!important} .card-hover{box-shadow:none!important;transform:none!important} }
-    </style>
+    @media (max-width:860px){.hero-img{max-width:440px}}
+
+/* 공통 차시 막대(앱 전체 동일) */
+.lessonbar .wrap{max-width:1080px;margin-left:auto;margin-right:auto;display:flex;align-items:center;gap:6px;padding:8px 16px;overflow-x:auto;scrollbar-width:none;box-sizing:border-box}
+.lessonbar a,.lessonbar span:not(.sp),.lessonbar button{white-space:nowrap;font-size:14px;line-height:1.2;text-decoration:none;padding:0 14px;border-radius:999px;min-height:44px;display:inline-flex;align-items:center;gap:6px;font-family:inherit;font-weight:400;color:var(--muted);box-sizing:border-box;border:0;background:none;cursor:pointer}
+.lessonbar span:not(.sp):not(.now){cursor:default}
+.lessonbar a:hover,.lessonbar button:hover{background:var(--sunken);color:var(--ink)}
+.lessonbar .now,.lessonbar .now:hover{background:var(--ink);color:var(--surface);font-weight:700}
+.lessonbar .home{font-weight:700;color:var(--ink);padding:0 14px;min-height:44px}
+.lessonbar .sp{flex:1;padding:0;min-height:0}
+.lessonbar .tool,.lessonbar button:not(.pg):not(.pend):not(.soon){border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+:root{color-scheme:light}
+.lessonbar span.now,.lessonbar span.now:hover{background:var(--ink);color:var(--surface);font-weight:700}
+.lessonbar .soon,.lessonbar .pg,.lessonbar .pend{padding:0 14px;border:0;background:none;color:var(--muted)}
+.lessonbar span.now{cursor:default}
+</style>
 </head>
-<body class="text-gray-800 pb-20 p-4 md:p-8">
+<body class="text-gray-800">
+
+<nav class="lessonbar" aria-label="차시 이동">
+  <div class="wrap">
+    <span class="now" aria-current="page">DIGIMON 메인</span>
+    <a href="https://kwonjungu.github.io/DIGIMON/1-2/">1~2차시</a>
+    <a href="https://kwonjungu.github.io/DIGIMON/3-4/">3~4차시</a>
+    <a href="https://kwonjungu.github.io/DIGIMON/5-6/">5~6차시</a>
+    <a href="https://kwonjungu.github.io/DIGIMON/7-8/">7~8차시</a>
+    <button type="button" class="pend" onclick="alert('준비 중인 차시입니다.')">9차시</button>
+  </div>
+</nav>
+<div class="page">
 
 <header class="text-center mb-16 mt-8">
-    <div class="inline-block bounce-slow mb-6">
-        <div class="w-28 h-28 bg-white rounded-full flex items-center justify-center text-6xl shadow-lg border-4 border-teal-200 mx-auto">
-            <i class="fa-solid fa-paw text-teal-500"></i>
-        </div>
-    </div>
+    <img class="hero-img" src="assets/hero-main.webp" alt="" aria-hidden="true" width="1280" height="720">
     <h1 class="text-4xl md:text-5xl font-bold text-teal-600 mb-4 drop-shadow-sm">
         DIGIMON<br>
         <span class="text-2xl md:text-3xl text-teal-500">데이터로 만나는 반려동물 사회</span>
@@ -42,56 +89,46 @@
         <!-- 1~2차시 -->
         <a href="1-2/" class="card-hover bg-white rounded-3xl p-6 shadow-md border-b-8 border-teal-400 text-center flex flex-col items-center relative group">
             <div class="badge bg-teal-500">문제 마주보기</div>
-            <div class="w-20 h-20 bg-teal-100 rounded-full flex items-center justify-center text-4xl text-teal-500 mb-3 shadow-inner float-anim">
-                <i class="fa-solid fa-magnifying-glass-chart"></i>
-            </div>
+            <img class="thumb" src="assets/lesson-1-2.webp" alt="" aria-hidden="true" width="800" height="600" loading="lazy">
             <h3 class="text-2xl font-bold text-teal-600 mb-2">1~2차시</h3>
-            <p class="text-base text-gray-600 leading-snug mb-3">데이터로 만나는<br>반려동물 사회</p>
-            <span class="bg-teal-100 text-teal-700 px-3 py-1 rounded-full text-xs font-bold">활동 3개</span>
+            <p class="text-base leading-snug mb-3" style="color:var(--muted)">데이터로 만나는<br>반려동물 사회</p>
+            <span class="bg-teal-100 text-teal-700 px-3 py-1 rounded-full text-sm font-bold">활동 3개</span>
         </a>
 
         <!-- 3~4차시 -->
         <a href="3-4/" class="card-hover bg-white rounded-3xl p-6 shadow-md border-b-8 border-purple-400 text-center flex flex-col items-center relative group">
             <div class="badge bg-purple-500">나만의 반려동물</div>
-            <div class="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center text-4xl text-purple-500 mb-3 shadow-inner float-anim" style="animation-delay:.3s">
-                <i class="fa-solid fa-wand-magic-sparkles"></i>
-            </div>
+            <img class="thumb" src="assets/lesson-3-4.webp" alt="" aria-hidden="true" width="800" height="600" loading="lazy">
             <h3 class="text-2xl font-bold text-purple-600 mb-2">3~4차시</h3>
-            <p class="text-base text-gray-600 leading-snug mb-3">나만의 반려동물<br>만들기</p>
-            <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-bold">활동지 열기</span>
+            <p class="text-base leading-snug mb-3" style="color:var(--muted)">나만의 반려동물<br>만들기</p>
+            <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-bold">활동지 열기</span>
         </a>
 
         <!-- 5~6차시 -->
         <a href="5-6/" class="card-hover bg-white rounded-3xl p-6 shadow-md border-b-8 border-orange-400 text-center flex flex-col items-center relative group">
             <div class="badge bg-orange-500">먹이 주기</div>
-            <div class="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center text-4xl text-orange-500 mb-3 shadow-inner float-anim" style="animation-delay:.6s">
-                <i class="fa-solid fa-bowl-food"></i>
-            </div>
+            <img class="thumb" src="assets/lesson-5-6.webp" alt="" aria-hidden="true" width="800" height="600" loading="lazy">
             <h3 class="text-2xl font-bold text-orange-600 mb-2">5~6차시</h3>
-            <p class="text-base text-gray-600 leading-snug mb-3">먹이 주기<br>(이미지 분류)</p>
-            <span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-bold">활동지 열기</span>
+            <p class="text-base leading-snug mb-3" style="color:var(--muted)">먹이 주기<br>(이미지 분류)</p>
+            <span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm font-bold">활동지 열기</span>
         </a>
 
         <!-- 7~8차시 -->
         <a href="7-8/" class="card-hover bg-white rounded-3xl p-6 shadow-md border-b-8 border-blue-400 text-center flex flex-col items-center relative group">
             <div class="badge bg-blue-500">음성 인식</div>
-            <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center text-4xl text-blue-500 mb-3 shadow-inner float-anim" style="animation-delay:.9s">
-                <i class="fa-solid fa-microphone-lines"></i>
-            </div>
+            <img class="thumb" src="assets/lesson-7-8.webp" alt="" aria-hidden="true" width="800" height="600" loading="lazy">
             <h3 class="text-2xl font-bold text-blue-600 mb-2">7~8차시</h3>
-            <p class="text-base text-gray-600 leading-snug mb-3">사이버 동물 키우기<br>(음성 인식)</p>
-            <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold">활동지 열기</span>
+            <p class="text-base leading-snug mb-3" style="color:var(--muted)">사이버 동물 키우기<br>(음성 인식)</p>
+            <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-bold">활동지 열기</span>
         </a>
 
         <!-- 9차시 -->
         <a href="9/" class="card-hover bg-white rounded-3xl p-6 shadow-md border-b-8 border-pink-400 text-center flex flex-col items-center relative group opacity-60">
             <div class="badge bg-pink-500">준비 중</div>
-            <div class="w-20 h-20 bg-pink-100 rounded-full flex items-center justify-center text-4xl text-pink-500 mb-3 shadow-inner float-anim" style="animation-delay:1.2s">
-                <i class="fa-solid fa-bullhorn"></i>
-            </div>
+            <img class="thumb" src="assets/lesson-9.webp" alt="" aria-hidden="true" width="800" height="600" loading="lazy">
             <h3 class="text-2xl font-bold text-pink-600 mb-2">9차시</h3>
-            <p class="text-base text-gray-600 leading-snug mb-3">우리 반 캠페인<br>(캔바)</p>
-            <span class="bg-pink-100 text-pink-700 px-3 py-1 rounded-full text-xs font-bold">개발 예정</span>
+            <p class="text-base leading-snug mb-3" style="color:var(--muted)">우리 반 캠페인<br>(캔바)</p>
+            <span class="bg-pink-100 text-pink-700 px-3 py-1 rounded-full text-sm font-bold">개발 예정</span>
         </a>
     </div>
 
@@ -103,9 +140,10 @@
         </a>
     </div>
 
-    <footer class="text-center text-gray-400 text-sm mt-16">
+    <footer class="text-center text-sm mt-16" style="color:var(--muted)">
         <p><i class="fa-solid fa-heart text-rose-300"></i> 2026 티처스랩 교사연구회 5기 · 데이터로 만나는 반려동물 사회 <i class="fa-solid fa-heart text-rose-300"></i></p>
     </footer>
 </main>
+</div>
 </body>
 </html>

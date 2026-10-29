@@ -1,12 +1,15 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" data-theme="light">
 <head>
     <meta charset="UTF-8">
+<meta name="color-scheme" content="light">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>7~8차시 · 사이버 세상 속 동물 훈련시키기</title>
+    <link rel="icon" href="../3-4/assets/mascot.webp" type="image/webp">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
     <style>
         :root {
             --primary-orange: #E8631F;
@@ -653,54 +656,173 @@
             .tab-content + .tab-content { page-break-before: always; }
         }
     </style>
+<style>
+/* ===== 앱 공통 디자인 (3~4차시 기준) ===== */
+:root{
+  --bg:#F2F6F8; --surface:#FFFFFF; --sunken:#E8EFF3; --line:#D5E0E6;
+  --ink:#1D2B36; --muted:#5B6E7B;
+  --a1:#0B8F78; --a1-soft:#DDF3EE; --a1-ink:#06604F;
+  --a2:#E2525B; --a2-soft:#FCE5E6; --a2-ink:#A8323A;
+  --a3:#D98806; --a3-soft:#FCEFD6; --a3-ink:#8E5700;
+  --a4:#4B6BD6; --a4-soft:#E3E9FB; --a4-ink:#2E4AA8;
+  --shadow:0 1px 2px rgba(29,43,54,.06),0 6px 18px rgba(29,43,54,.06);
+  --f-display:"Jua","IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
+  --primary-orange:var(--a3-ink); --primary-green:var(--a2-ink); --primary-blue:var(--a4-ink);
+  --text-color:var(--ink);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.65;padding:0;margin:0;word-break:keep-all;overflow-wrap:break-word}
+h1,h2,h3{font-family:var(--f-display);font-weight:400;line-height:1.3;text-wrap:balance}
+button,input,textarea{font-family:inherit}
+:focus-visible{outline:3px solid var(--a4);outline-offset:2px}
+img{max-width:100%}
+
+.lessonbar{background:var(--surface);border-bottom:1px solid var(--line);margin-bottom:20px}
+.lessonbar .wrap{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:8px;padding:10px 16px;overflow-x:auto;scrollbar-width:none}
+.lessonbar a,.lessonbar span,.lessonbar button{white-space:nowrap;font-size:14px;text-decoration:none;padding:6px 12px;border-radius:999px;color:var(--muted);min-height:36px;display:inline-flex;align-items:center;font-family:inherit;font-weight:400}
+.lessonbar a:hover,.lessonbar .pend:hover{background:var(--sunken)}
+.lessonbar .pend{border:0;background:none;cursor:pointer}
+.lessonbar .now{background:var(--ink);color:var(--surface);font-weight:700}
+.lessonbar .home,.lessonbar .home span{font-weight:700;color:var(--ink);padding:0;min-height:0}
+.lessonbar .home{gap:.25em}
+.lessonbar .sp{flex:1;padding:0}
+.lessonbar .tool{border:1px solid var(--line);background:var(--surface);cursor:pointer;min-height:44px;padding:6px 14px}
+.lessonbar .tool:hover{background:var(--sunken);color:var(--ink)}
+
+.container{max-width:1000px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+header.worksheet-header{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:22px;align-items:center;text-align:left;border:0;box-shadow:var(--shadow);border-radius:20px;padding:24px 26px}
+.worksheet-header .hero-text{min-width:0}
+.worksheet-header .hero-art{width:100%;height:auto;aspect-ratio:16/9;border-radius:14px;background:var(--a1-soft);object-fit:cover}
+.main-tag{background:var(--a1-soft);color:var(--a1-ink);border-radius:999px;padding:4px 14px;font-size:13px;letter-spacing:.04em;margin-bottom:0}
+header.worksheet-header h1{font-size:clamp(28px,4.6vw,42px);margin:12px 0 0;color:var(--ink);font-weight:400;letter-spacing:-.01em}
+.objective-box{background:var(--surface);border:1.5px solid var(--line);border-left:5px solid var(--a4);border-radius:14px;margin-top:16px}
+.objective-box span{color:var(--a4-ink)}
+
+.tab-menu{gap:8px}
+.tab-btn{font-family:var(--f-display);font-weight:400;font-size:1.15rem;min-height:56px;padding:10px 8px;border:2px solid transparent;border-radius:14px;box-shadow:var(--shadow);color:var(--ink);transition:none}
+.tab-btn:active{transform:none;box-shadow:var(--shadow)}
+.tab-btn[data-tab="1"].active{background:var(--a1-soft);border-color:var(--a1);color:var(--a1-ink);box-shadow:var(--shadow)}
+.tab-btn[data-tab="2"].active{background:var(--a2-soft);border-color:var(--a2);color:var(--a2-ink);box-shadow:var(--shadow)}
+.tab-btn[data-tab="3"].active{background:var(--a3-soft);border-color:var(--a3);color:var(--a3-ink);box-shadow:var(--shadow)}
+
+.activity-card{border:0;border-radius:20px;padding:20px 24px 26px;box-shadow:var(--shadow);overflow:hidden}
+.phead{display:grid;grid-template-columns:minmax(0,1fr) clamp(180px,24vw,260px);column-gap:24px;align-items:center;border-radius:20px;padding:18px 22px;margin:0 0 22px}
+.phead>.phead-body{grid-column:1;min-width:0}
+.phead .phead-art{grid-column:2;grid-row:1;width:100%;height:auto;aspect-ratio:3/2;align-self:end;object-fit:cover}
+.phead-1{background:var(--a1-soft)} .phead-2{background:var(--a2-soft)} .phead-3{background:var(--a3-soft)}
+.activity-badge{box-shadow:none;margin-bottom:8px;padding:3px 14px;font-size:13px;font-weight:700;letter-spacing:.05em;background:var(--surface)!important}
+.badge-1{color:var(--a1-ink)!important} .badge-2{color:var(--a2-ink)!important} .badge-3{color:var(--a3-ink)!important}
+.activity-card .phead h2{display:block;margin:4px 0 0;font-size:clamp(24px,3.6vw,32px);font-weight:400;vertical-align:baseline}
+
+.step-box.active-step .step-number{background:var(--a1-ink)}
+.helper-title,.checklist-title{color:var(--a2-ink)}
+.check-item{min-height:48px}
+.check-item input[type="checkbox"]{accent-color:var(--a2)}
+.check-label{min-height:48px}
+.check-label input{accent-color:var(--a3)}
+.option-btn{min-height:44px}
+.word-add-btn,.modal-close-btn{min-height:44px}
+.check-item input[type="checkbox"]:checked + span{color:#6B7B87}
+.submit-btn{background:var(--a4);box-shadow:0 6px 0 var(--a4-ink);min-height:52px}
+.submit-btn:active{box-shadow:0 2px 0 var(--a4-ink)}
+.success-msg{color:var(--a1-ink)}
+.activity-card textarea:focus{border-color:var(--a4)}
+
+@media (max-width:860px){
+  .phead{grid-template-columns:minmax(0,1fr) 150px;column-gap:14px}
+  header.worksheet-header{grid-template-columns:minmax(0,1fr) minmax(0,.8fr)}
+}
+@media (max-width:620px){
+  body{font-size:16px}
+  header.worksheet-header{grid-template-columns:minmax(0,1fr);padding:18px}
+  .worksheet-header .hero-art{max-height:200px}
+  .phead{grid-template-columns:minmax(0,1fr);padding:16px;margin:0 0 18px}
+  .phead .phead-art{display:none}
+  .activity-card{padding:16px}
+  .tab-btn{font-size:1rem}
+  .options-group{grid-template-columns:1fr}
+  .check-group{flex-direction:column;gap:10px}
+}
+@media print{
+  .lessonbar{display:none!important}
+  .phead-art,.hero-art{display:none!important}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* 공통 차시 막대(앱 전체 동일) */
+.lessonbar .wrap{max-width:1080px;margin-left:auto;margin-right:auto;display:flex;align-items:center;gap:6px;padding:8px 16px;overflow-x:auto;scrollbar-width:none;box-sizing:border-box}
+.lessonbar a,.lessonbar span:not(.sp),.lessonbar button{white-space:nowrap;font-size:14px;line-height:1.2;text-decoration:none;padding:0 14px;border-radius:999px;min-height:44px;display:inline-flex;align-items:center;gap:6px;font-family:inherit;font-weight:400;color:var(--muted);box-sizing:border-box;border:0;background:none;cursor:pointer}
+.lessonbar span:not(.sp):not(.now){cursor:default}
+.lessonbar a:hover,.lessonbar button:hover{background:var(--sunken);color:var(--ink)}
+.lessonbar .now,.lessonbar .now:hover{background:var(--ink);color:var(--surface);font-weight:700}
+.lessonbar .home{font-weight:700;color:var(--ink);padding:0 14px;min-height:44px}
+.lessonbar .sp{flex:1;padding:0;min-height:0}
+.lessonbar .tool,.lessonbar button:not(.pg):not(.pend):not(.soon){border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+body .container{max-width:1080px;margin-left:auto;margin-right:auto}
+:root{color-scheme:light}
+.lessonbar span.now,.lessonbar span.now:hover{background:var(--ink);color:var(--surface);font-weight:700}
+:root body h1{color:var(--ink)}
+.tab-btn{display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.25}
+.tab-btn i{font-size:18px}
+.tab-btn small{font-size:12px;font-weight:500;opacity:.85}
+@media (max-width:620px){.tab-btn small{display:none}}
+.lessonbar .soon,.lessonbar .pg,.lessonbar .pend{padding:0 14px;border:0;background:none;color:var(--muted)}
+.lessonbar span.now{cursor:default}
+header.worksheet-header h1{font-size:clamp(30px,3vw,34px);text-wrap:balance;word-break:keep-all}
+.tab-btn small{font-family:var(--f-body,'IBM Plex Sans KR',sans-serif);font-size:13px;font-weight:500;color:var(--muted);opacity:1}
+.tab-btn.active small{color:inherit}
+.tab-btn[data-tab="1"] i{color:var(--a1)}.tab-btn[data-tab="2"] i{color:var(--a2)}.tab-btn[data-tab="3"] i{color:var(--a3)}
+</style>
 </head>
 <body>
 
 <!-- 상단 네비게이션 (프로젝트 공통 스타일) -->
-<nav class="max-w-4xl mx-auto mb-6 no-print" style="font-family: 'Noto Sans KR', sans-serif;">
-    <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
-        <a href="../" class="inline-flex items-center gap-2 bg-white px-5 py-2.5 rounded-full shadow-md text-blue-600 font-bold hover:bg-blue-50 transition text-lg">
-            <i class="fa-solid fa-arrow-left"></i> 메인으로
-        </a>
-        <div class="flex gap-2 flex-wrap">
-            <a href="../1-2/" class="px-4 py-2 rounded-full text-sm font-bold bg-teal-100 text-teal-700 hover:bg-teal-200 transition">1~2차시</a>
-            <a href="../3-4/" class="px-4 py-2 rounded-full text-sm font-bold bg-purple-100 text-purple-700 hover:bg-purple-200 transition">3~4차시</a>
-            <a href="../5-6/" class="px-4 py-2 rounded-full text-sm font-bold bg-orange-100 text-orange-700 hover:bg-orange-200 transition">5~6차시</a>
-            <span class="px-4 py-2 rounded-full text-sm font-bold bg-blue-500 text-white shadow-md">7~8차시</span>
-            <button onclick="alert('준비 중인 차시입니다.')" class="px-4 py-2 rounded-full text-sm font-bold bg-pink-100 text-pink-700 hover:bg-pink-200 transition">9차시</button>
-        </div>
-    </div>
-    <div class="flex justify-center gap-3">
-        <button onclick="window.print()" class="inline-flex items-center gap-2 bg-white px-5 py-2.5 rounded-full shadow-md text-purple-600 font-bold hover:bg-purple-50 transition">
-            <i class="fa-solid fa-print"></i> 인쇄하기
-        </button>
-        <button onclick="resetAll()" class="inline-flex items-center gap-2 bg-white px-5 py-2.5 rounded-full shadow-md text-red-500 font-bold hover:bg-red-50 transition">
-            <i class="fa-solid fa-rotate-left"></i> 초기화
-        </button>
+<nav class="lessonbar no-print" aria-label="차시 이동">
+    <div class="wrap">
+        <a class="home" href="https://kwonjungu.github.io/DIGIMON/">DIGIMON 메인</a>
+        <a href="https://kwonjungu.github.io/DIGIMON/1-2/">1~2차시</a>
+        <a href="https://kwonjungu.github.io/DIGIMON/3-4/">3~4차시</a>
+        <a href="https://kwonjungu.github.io/DIGIMON/5-6/">5~6차시</a>
+        <span class="now" aria-current="page">7~8차시</span>
+        <button type="button" class="pend" onclick="alert('준비 중인 차시입니다.')">9차시</button>
+        <span class="sp"></span>
+        <button type="button" class="tool" onclick="window.print()"><i class="fa-solid fa-print"></i>&nbsp;인쇄하기</button>
+        <button type="button" class="tool" onclick="resetAll()"><i class="fa-solid fa-rotate-left"></i>&nbsp;초기화</button>
     </div>
 </nav>
 
 <div class="container">
 
     <header class="worksheet-header">
+        <div class="hero-text">
         <div class="main-tag">🤖 인공지능과 소프트웨어</div>
         <h1>🐾 사이버 세상 속 동물 훈련시키기</h1>
         <div class="objective-box">
             <span>🎯 학습 목표 :</span> 엔트리의 음성인식 기능을 활용해 동물을 움직이게 하는 프로그램을 만들 수 있다.
         </div>
+        </div>
+        <img class="hero-art" src="assets/hero.webp" alt="" aria-hidden="true" width="1280" height="720">
     </header>
 
     <nav class="tab-menu">
-        <button class="tab-btn active" data-tab="1" onclick="openTab('1')">활동 1</button>
-        <button class="tab-btn" data-tab="2" onclick="openTab('2')">활동 2</button>
-        <button class="tab-btn" data-tab="3" onclick="openTab('3')">활동 3</button>
+        <button class="tab-btn active" data-tab="1" onclick="openTab('1')"><i class="fa-solid fa-microphone" aria-hidden="true"></i><b>활동 1</b><small>목소리로 나만의 동물을 움직여요</small></button>
+        <button class="tab-btn" data-tab="2" onclick="openTab('2')"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i><b>활동 2</b><small>나만의 동물의 움직임을 정교화해요</small></button>
+        <button class="tab-btn" data-tab="3" onclick="openTab('3')"><i class="fa-solid fa-volume-high" aria-hidden="true"></i><b>활동 3</b><small>시끄러운 소음 속 AI의 오류를 발견해요</small></button>
     </nav>
 
     <!-- 활동 1 탭 -->
     <div id="tab-content-1" class="tab-content active">
         <section class="activity-card">
-            <span class="activity-badge badge-1">활동 1</span>
-            <h2>목소리로 나만의 동물을 움직여요</h2>
+            <div class="phead phead-1">
+                <div class="phead-body">
+                <span class="activity-badge badge-1">활동 1</span>
+                <h2>목소리로 나만의 동물을 움직여요</h2>
+                </div>
+                <img class="phead-art" src="assets/act1-voice.webp" alt="" aria-hidden="true" width="600" height="400" loading="lazy">
+            </div>
 
             <!-- 코드 퀴즈 영역 -->
             <div class="quiz-container">
@@ -844,8 +966,13 @@
     <!-- 활동 2 탭 -->
     <div id="tab-content-2" class="tab-content">
         <section class="activity-card">
-            <span class="activity-badge badge-2">활동 2</span>
-            <h2>나만의 동물의 움직임을 정교화해요</h2>
+            <div class="phead phead-2">
+                <div class="phead-body">
+                <span class="activity-badge badge-2">활동 2</span>
+                <h2>나만의 동물의 움직임을 정교화해요</h2>
+                </div>
+                <img class="phead-art" src="assets/act2-refine.webp" alt="" aria-hidden="true" width="600" height="400" loading="lazy">
+            </div>
 
             <div class="checklist-box">
                 <div class="checklist-title">✅ 나의 프로그램 작동 점검표</div>
@@ -880,8 +1007,13 @@
     <!-- 활동 3 탭 -->
     <div id="tab-content-3" class="tab-content">
         <section class="activity-card">
-            <span class="activity-badge badge-3">활동 3</span>
-            <h2>시끄러운 소음 속 AI의 오류를 발견해요</h2>
+            <div class="phead phead-3">
+                <div class="phead-body">
+                <span class="activity-badge badge-3">활동 3</span>
+                <h2>시끄러운 소음 속 AI의 오류를 발견해요</h2>
+                </div>
+                <img class="phead-art" src="assets/act3-noise.webp" alt="" aria-hidden="true" width="600" height="400" loading="lazy">
+            </div>
 
             <p style="font-weight: bold; margin-bottom: 5px;">🔊 교실 소음 상황에서 음성 인식을 시도했을 때, 인식이 잘 됐나요?</p>
 
