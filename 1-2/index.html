@@ -342,24 +342,54 @@
         <div class="phead k2">
             <div>
                 <h2 class="text-2xl font-bold text-rose-600 mb-2"><i class="fa-solid fa-heart-crack mr-2"></i>활동 2. 한 발짝 더, 동물 데이터를 들여다봐요</h2>
-                <p class="text-gray-500 mb-6">우리나라에는 매년 수많은 유기동물이 생겨요. 진짜 데이터를 직접 정리해 보고, 엔트리로 차트도 만들어 봐요.</p>
+                <p class="text-gray-500 mb-6">우리나라에는 매년 수많은 유기동물이 생겨요. 가상 도시 '별빛시'의 자료를 직접 표로 정리해 보고, 엔트리로 차트도 만들어 봐요.</p>
             </div>
             <img class="phead-art" src="assets/act2-trend.webp" alt="" aria-hidden="true" width="600" height="400" loading="lazy">
         </div>
 
-        <!-- (1) 동물보호관리시스템 -->
-        <div class="bg-rose-50 rounded-2xl p-4 border-2 border-rose-100 mb-6">
-            <p class="text-rose-800 font-bold mb-2"><i class="fa-solid fa-database mr-1"></i>① 동물보호관리시스템에서 유기동물 공고 살펴보기</p>
-            <p class="text-gray-700 mb-2">사이트에서 <b class="text-rose-700">'보호중인 동물'</b> 또는 <b class="text-rose-700">'공고중인 동물'</b>을 검색해 우리 지역의 유기동물을 확인해 봐요.</p>
-            <a href="https://www.animal.go.kr/" target="_blank" class="inline-flex items-center gap-2 bg-white border-2 border-rose-400 text-rose-700 font-bold py-2 px-4 rounded-full text-sm hover:bg-rose-100 transition">
-                <i class="fa-solid fa-arrow-up-right-from-square"></i> 동물보호관리시스템 열기
-            </a>
+        <!-- (1) 별빛시 가상 자료 -->
+        <div class="bg-rose-50 rounded-2xl p-4 border-2 border-rose-100 mb-6" data-html2canvas-ignore="true">
+            <p class="text-rose-800 font-bold mb-2"><i class="fa-solid fa-database mr-1"></i>① 별빛시 유기동물 자료 살펴보기</p>
+            <p class="text-gray-700 mb-3"><b class="text-rose-700">별빛시는 수업을 위해 만든 가상의 도시</b>예요. 아래의 동물, 장소, 숫자는 모두 지어낸 자료예요.</p>
 
-            <!-- 데이터 다운로드 -->
-            <div class="mt-4 bg-white rounded-2xl p-3 border-2 border-dashed border-rose-200">
-                <p class="text-sm text-rose-700 font-bold mb-2"><i class="fa-solid fa-file-csv mr-1"></i>빈 템플릿 내려받기 (직접 조사해서 채우기)</p>
-                <a href="data/abandoned_animals_template.csv" download class="inline-flex items-center gap-1 bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold py-1.5 px-3 rounded-full transition"><i class="fa-solid fa-download"></i> 유기동물 정리 템플릿 CSV</a>
+            <p class="text-sm text-rose-700 font-bold mb-2"><i class="fa-solid fa-paw mr-1"></i>2026년 가을 공고 살펴보기</p>
+            <div class="flex flex-wrap gap-2 mb-3">
+                    <button type="button" data-kind="전체" onclick="showNotices('전체')" class="notice-filter font-bold text-xs py-1.5 px-3 rounded-full border-2 border-rose-300 transition">전체 30건</button>
+                    <button type="button" data-kind="개" onclick="showNotices('개')" class="notice-filter font-bold text-xs py-1.5 px-3 rounded-full border-2 border-rose-300 transition">개 19건</button>
+                    <button type="button" data-kind="고양이" onclick="showNotices('고양이')" class="notice-filter font-bold text-xs py-1.5 px-3 rounded-full border-2 border-rose-300 transition">고양이 10건</button>
+                    <button type="button" data-kind="그 외" onclick="showNotices('그 외')" class="notice-filter font-bold text-xs py-1.5 px-3 rounded-full border-2 border-rose-300 transition">그 외 1건</button>
             </div>
+            <div id="noticeList" class="grid sm:grid-cols-2 gap-2 max-h-96 overflow-y-auto pr-1 mb-4" tabindex="0" aria-label="별빛시 가상 공고 목록"></div>
+
+            <p class="text-sm text-rose-700 font-bold mb-2"><i class="fa-solid fa-book-open mr-1"></i>별빛시 동물보호센터 연간 기록</p>
+            <div class="grid sm:grid-cols-2 gap-2 mb-2">
+                    <div class="bg-white rounded-xl p-3 border border-rose-200">
+                        <p class="font-bold text-rose-700 mb-1">2022년 기록</p>
+                        <p class="text-sm text-gray-700">개 <b>412</b>마리 · 고양이 <b>146</b>마리 · 그 외 <b>9</b>마리</p>
+                    </div>
+                    <div class="bg-white rounded-xl p-3 border border-rose-200">
+                        <p class="font-bold text-rose-700 mb-1">2023년 기록</p>
+                        <p class="text-sm text-gray-700">개 <b>398</b>마리 · 고양이 <b>153</b>마리 · 그 외 <b>11</b>마리</p>
+                    </div>
+                    <div class="bg-white rounded-xl p-3 border border-rose-200">
+                        <p class="font-bold text-rose-700 mb-1">2024년 기록</p>
+                        <p class="text-sm text-gray-700">개 <b>371</b>마리 · 고양이 <b>161</b>마리 · 그 외 <b>8</b>마리</p>
+                    </div>
+                    <div class="bg-white rounded-xl p-3 border border-rose-200">
+                        <p class="font-bold text-rose-700 mb-1">2025년 기록</p>
+                        <p class="text-sm text-gray-700">개 <b>336</b>마리 · 고양이 <b>172</b>마리 · 그 외 <b>12</b>마리</p>
+                    </div>
+            </div>
+            <p class="text-sm text-gray-700 mb-4"><i class="fa-solid fa-pencil mr-1"></i>이 기록을 보고 ②번 표에 숫자를 직접 입력해요.</p>
+
+            <div class="bg-white rounded-2xl p-3 border-2 border-dashed border-rose-200">
+                <p class="text-sm text-rose-700 font-bold mb-2"><i class="fa-solid fa-file-csv mr-1"></i>파일 내려받기</p>
+                <div class="flex flex-wrap gap-2">
+                    <a href="data/virtual_byeolbit_notices_2026.csv" download class="inline-flex items-center gap-1 bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold py-1.5 px-3 rounded-full transition"><i class="fa-solid fa-download"></i> 별빛시 공고 목록 CSV</a>
+                    <a href="data/abandoned_animals_template.csv" download class="inline-flex items-center gap-1 bg-white border-2 border-rose-400 text-rose-700 text-xs font-bold py-1.5 px-3 rounded-full transition"><i class="fa-solid fa-download"></i> 빈 정리표 CSV</a>
+                </div>
+            </div>
+            <p class="text-xs text-gray-500 mt-3">진짜 공고가 궁금하면 <a href="https://www.animal.go.kr/front/index.do" target="_blank" rel="noopener" class="underline">국가동물보호정보시스템</a>의 '보호센터 보호동물' 메뉴를 찾아봐요.</p>
         </div>
 
         <!-- (2) 종류·연도별 정리표 -->
@@ -376,27 +406,27 @@
                     <tbody>
                         <tr class="border-t border-rose-100">
                             <td class="py-3 px-3 font-bold text-center">2022</td>
-                            <td class="py-3 px-3"><input data-key="y22_dog" type="number" placeholder="마리" class="w-full px-2 py-2 rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
-                            <td class="py-3 px-3"><input data-key="y22_cat" type="number" placeholder="마리" class="w-full px-2 py-2 rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
-                            <td class="py-3 px-3"><input data-key="y22_etc" type="number" placeholder="마리" class="w-full px-2 py-2 rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
+                            <td class="py-3 px-1 md:px-3"><input data-key="y22_dog" type="number" inputmode="numeric" placeholder="마리" class="w-full min-w-0 px-1 md:px-2 py-2 text-center rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
+                            <td class="py-3 px-1 md:px-3"><input data-key="y22_cat" type="number" inputmode="numeric" placeholder="마리" class="w-full min-w-0 px-1 md:px-2 py-2 text-center rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
+                            <td class="py-3 px-1 md:px-3"><input data-key="y22_etc" type="number" inputmode="numeric" placeholder="마리" class="w-full min-w-0 px-1 md:px-2 py-2 text-center rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
                         </tr>
                         <tr class="border-t border-rose-100">
                             <td class="py-3 px-3 font-bold text-center">2023</td>
-                            <td class="py-3 px-3"><input data-key="y23_dog" type="number" placeholder="마리" class="w-full px-2 py-2 rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
-                            <td class="py-3 px-3"><input data-key="y23_cat" type="number" placeholder="마리" class="w-full px-2 py-2 rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
-                            <td class="py-3 px-3"><input data-key="y23_etc" type="number" placeholder="마리" class="w-full px-2 py-2 rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
+                            <td class="py-3 px-1 md:px-3"><input data-key="y23_dog" type="number" inputmode="numeric" placeholder="마리" class="w-full min-w-0 px-1 md:px-2 py-2 text-center rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
+                            <td class="py-3 px-1 md:px-3"><input data-key="y23_cat" type="number" inputmode="numeric" placeholder="마리" class="w-full min-w-0 px-1 md:px-2 py-2 text-center rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
+                            <td class="py-3 px-1 md:px-3"><input data-key="y23_etc" type="number" inputmode="numeric" placeholder="마리" class="w-full min-w-0 px-1 md:px-2 py-2 text-center rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
                         </tr>
                         <tr class="border-t border-rose-100">
                             <td class="py-3 px-3 font-bold text-center">2024</td>
-                            <td class="py-3 px-3"><input data-key="y24_dog" type="number" placeholder="마리" class="w-full px-2 py-2 rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
-                            <td class="py-3 px-3"><input data-key="y24_cat" type="number" placeholder="마리" class="w-full px-2 py-2 rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
-                            <td class="py-3 px-3"><input data-key="y24_etc" type="number" placeholder="마리" class="w-full px-2 py-2 rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
+                            <td class="py-3 px-1 md:px-3"><input data-key="y24_dog" type="number" inputmode="numeric" placeholder="마리" class="w-full min-w-0 px-1 md:px-2 py-2 text-center rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
+                            <td class="py-3 px-1 md:px-3"><input data-key="y24_cat" type="number" inputmode="numeric" placeholder="마리" class="w-full min-w-0 px-1 md:px-2 py-2 text-center rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
+                            <td class="py-3 px-1 md:px-3"><input data-key="y24_etc" type="number" inputmode="numeric" placeholder="마리" class="w-full min-w-0 px-1 md:px-2 py-2 text-center rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
                         </tr>
                         <tr class="border-t border-rose-100">
                             <td class="py-3 px-3 font-bold text-center">2025</td>
-                            <td class="py-3 px-3"><input data-key="y25_dog" type="number" placeholder="마리" class="w-full px-2 py-2 rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
-                            <td class="py-3 px-3"><input data-key="y25_cat" type="number" placeholder="마리" class="w-full px-2 py-2 rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
-                            <td class="py-3 px-3"><input data-key="y25_etc" type="number" placeholder="마리" class="w-full px-2 py-2 rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
+                            <td class="py-3 px-1 md:px-3"><input data-key="y25_dog" type="number" inputmode="numeric" placeholder="마리" class="w-full min-w-0 px-1 md:px-2 py-2 text-center rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
+                            <td class="py-3 px-1 md:px-3"><input data-key="y25_cat" type="number" inputmode="numeric" placeholder="마리" class="w-full min-w-0 px-1 md:px-2 py-2 text-center rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
+                            <td class="py-3 px-1 md:px-3"><input data-key="y25_etc" type="number" inputmode="numeric" placeholder="마리" class="w-full min-w-0 px-1 md:px-2 py-2 text-center rounded-lg border-2 border-rose-200 focus:border-rose-400 outline-none"></td>
                         </tr>
                     </tbody>
                 </table>
@@ -423,6 +453,19 @@
             <label class="block text-base font-bold text-rose-700 mb-2"><i class="fa-solid fa-lightbulb mr-1"></i>그래프에서 발견한 사실</label>
             <textarea data-key="entry_finding" rows="3" placeholder="예) 개 유기 수는 줄지만 고양이는 늘었어요. 그래서 ~ 하다고 생각해요." class="w-full px-3 py-2 rounded-xl border-2 border-rose-200 focus:border-rose-400 outline-none resize-none"></textarea>
         </div>
+
+        <!-- (5) 실제 전국 자료 비교 -->
+        <details class="mt-4 bg-white rounded-2xl p-4 border-2 border-rose-100" data-html2canvas-ignore="true">
+            <summary class="font-bold text-rose-700 cursor-pointer"><i class="fa-solid fa-magnifying-glass-chart mr-1"></i>한 번 더: 실제 전국 자료와 견주어 봐요</summary>
+            <p class="text-gray-700 mt-3 mb-2">별빛시와 전국은 무엇이 같고, 무엇이 다른가요?</p>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead><tr class="bg-rose-50"><th class="py-1 px-2 text-rose-700">연도</th><th class="py-1 px-2 text-rose-700">개</th><th class="py-1 px-2 text-rose-700">고양이</th><th class="py-1 px-2 text-rose-700">그 외</th></tr></thead>
+                    <tbody><tr class="border-t border-rose-100"><td class="py-1 px-2 text-center font-bold">2022</td><td class="py-1 px-2 text-right">80,393</td><td class="py-1 px-2 text-right">31,525</td><td class="py-1 px-2 text-right">1,522</td></tr><tr class="border-t border-rose-100"><td class="py-1 px-2 text-center font-bold">2023</td><td class="py-1 px-2 text-right">80,467</td><td class="py-1 px-2 text-right">30,889</td><td class="py-1 px-2 text-right">1,716</td></tr><tr class="border-t border-rose-100"><td class="py-1 px-2 text-center font-bold">2024</td><td class="py-1 px-2 text-right">77,304</td><td class="py-1 px-2 text-right">27,826</td><td class="py-1 px-2 text-right">1,694</td></tr><tr class="border-t border-rose-100"><td class="py-1 px-2 text-center font-bold">2025</td><td class="py-1 px-2 text-right">67,384</td><td class="py-1 px-2 text-right">26,969</td><td class="py-1 px-2 text-right">1,332</td></tr></tbody>
+                </table>
+            </div>
+            <p class="text-xs text-gray-500 mt-2">단위: 마리. 출처: 동물보호 복지 실태조사 수치(데일리벳·비건뉴스 보도). 2022년 종류별 수는 2023년 증감으로 거슬러 계산한 값이에요.</p>
+        </details>
     </section>
 
     <!-- 공유 -->
@@ -669,6 +712,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         el.addEventListener('change',saveAll);
     });
     drawTrendChart();
+    showNotices('전체');
 });
 
 // ===== Chart 1: Google Trends (강아지 vs 고양이, 2021~2026 발췌) =====
@@ -713,6 +757,31 @@ function drawSpeciesChart(){
             scales:{x:{beginAtZero:true,max:100,ticks:{callback:v=>v+'%',font:{family:'Jua, sans-serif'}}},
                     y:{ticks:{font:{family:'Jua, sans-serif',size:12}}}}
         }
+    });
+}
+
+// ===== 활동 2: 별빛시 가상 공고 (data/virtual_byeolbit_notices_2026.csv와 같은 내용) =====
+const NOTICES = [["가상-2026-0001","2026-10-12","개","믹스견","수컷","2살","갈색","별빛시 은하동 공원 산책로","목줄을 한 채 혼자 돌아다님","주인에게 돌아감"],["가상-2026-0002","2026-10-13","고양이","한국 고양이","암컷","2개월","삼색","별빛시 달빛동 주택가 화단","눈곱이 많고 울음소리가 큼","입양됨"],["가상-2026-0003","2026-10-14","개","말티즈","암컷","6살","흰색","별빛시 솔숲동 아파트 입구","털이 많이 엉켜 있음","보호중"],["가상-2026-0004","2026-10-15","개","믹스견","수컷","1살","검정색","별빛시 무지개동 하천 둔치","사람을 잘 따름","입양됨"],["가상-2026-0005","2026-10-16","고양이","코리안 숏헤어","수컷","1살","고등어색","별빛시 푸른내동 시장 골목","왼쪽 앞다리를 절뚝거림","보호중"],["가상-2026-0006","2026-10-17","개","푸들","수컷","4살","갈색","별빛시 은하동 버스 정류장","빨간색 옷을 입고 있음","주인에게 돌아감"],["가상-2026-0007","2026-10-18","개","믹스견","암컷","3살","황색","별빛시 달빛동 공터","낯선 사람을 경계함","보호중"],["가상-2026-0008","2026-10-19","고양이","한국 고양이","암컷","3개월","흰색+검정색","별빛시 솔숲동 상가 뒤편","형제 고양이와 함께 발견됨","입양됨"],["가상-2026-0009","2026-10-20","개","진도 믹스","수컷","5살","흰색","별빛시 무지개동 산책로","짧은 줄이 목에 묶여 있음","보호중"],["가상-2026-0010","2026-10-21","개","포메라니안","암컷","2살","주황색","별빛시 푸른내동 놀이터","겁이 많지만 물지 않음","입양됨"],["가상-2026-0011","2026-10-22","고양이","믹스묘","수컷","4살","회색","별빛시 은하동 주차장","귀 끝이 조금 잘려 있음","보호중"],["가상-2026-0012","2026-10-23","개","믹스견","수컷","7살","갈색+흰색","별빛시 달빛동 농로","이빨이 많이 닳아 있음","보호중"],["가상-2026-0013","2026-10-24","개","시츄","암컷","9살","흰색+갈색","별빛시 솔숲동 아파트 놀이터","한쪽 눈이 뿌옇게 보임","주인에게 돌아감"],["가상-2026-0014","2026-10-25","고양이","한국 고양이","수컷","5개월","노란색","별빛시 무지개동 편의점 앞","사람에게 먼저 다가옴","입양됨"],["가상-2026-0015","2026-10-26","개","믹스견","암컷","1살","검정색+흰색","별빛시 푸른내동 하천변","뒷다리에 작은 상처가 있음","보호중"],["가상-2026-0016","2026-10-27","그 외","토끼","암컷","1살","흰색","별빛시 은하동 공원 잔디밭","사람 손에 익숙함","보호중"],["가상-2026-0017","2026-10-28","개","말티즈 믹스","수컷","3살","흰색","별빛시 달빛동 골목길","목걸이는 있으나 이름표가 없음","보호중"],["가상-2026-0018","2026-10-29","고양이","러시안 블루","암컷","3살","회색","별빛시 솔숲동 아파트 복도","집에서 키우던 것으로 보임","주인에게 돌아감"],["가상-2026-0019","2026-10-30","개","믹스견","수컷","2살","황색","별빛시 무지개동 공사장 근처","먹이를 주면 경계를 풂","공고중"],["가상-2026-0020","2026-10-31","개","믹스견","암컷","4살","갈색","별빛시 푸른내동 야산 입구","최근 새끼를 낳은 흔적이 있음","공고중"],["가상-2026-0021","2026-11-01","고양이","한국 고양이","수컷","2개월","검정색","별빛시 은하동 상자 안","상자에 담긴 채 발견됨","공고중"],["가상-2026-0022","2026-11-02","개","치와와","암컷","6살","크림색","별빛시 달빛동 약국 앞","분홍색 옷을 입고 있음","공고중"],["가상-2026-0023","2026-11-03","개","믹스견","수컷","3개월","검정색+황색","별빛시 솔숲동 텃밭","형제 강아지와 함께 발견됨","공고중"],["가상-2026-0024","2026-11-04","고양이","믹스묘","암컷","1살","치즈색+흰색","별빛시 무지개동 주택가","오른쪽 귀에 상처가 있음","공고중"],["가상-2026-0025","2026-11-05","개","믹스견","수컷","5살","흰색+갈색","별빛시 푸른내동 도로변","다리를 조금 저는 모습","공고중"],["가상-2026-0026","2026-11-06","개","비숑 프리제","수컷","2살","흰색","별빛시 은하동 카페 앞","미용을 받은 지 오래되지 않음","공고중"],["가상-2026-0027","2026-11-07","고양이","한국 고양이","수컷","6개월","고등어색+흰색","별빛시 달빛동 공원","사람을 피하지 않음","공고중"],["가상-2026-0028","2026-11-08","개","믹스견","암컷","2살","갈색","별빛시 솔숲동 초등학교 근처","빨간 목줄을 하고 있음","공고중"],["가상-2026-0029","2026-11-08","개","믹스견","수컷","8살","흰색","별빛시 무지개동 저수지 근처","몸이 많이 말라 있음","공고중"],["가상-2026-0030","2026-11-09","고양이","한국 고양이","암컷","3살","검정색","별빛시 푸른내동 시장 입구","귀 끝이 조금 잘려 있음","공고중"]];
+function showNotices(kind){
+    const list = NOTICES.filter(n => kind==='전체' || n[2]===kind);
+    document.getElementById('noticeList').innerHTML = list.map(n => `
+        <article class="bg-white rounded-xl p-3 border border-rose-200 text-sm">
+            <div class="flex justify-between gap-2 items-start">
+                <b class="text-rose-700">${n[3]}</b>
+                <span class="text-xs font-bold text-rose-600 whitespace-nowrap">${n[9]}</span>
+            </div>
+            <p class="text-gray-700">${n[2]} · ${n[4]} · ${n[5]} · ${n[6]}</p>
+            <p class="text-gray-700">${n[7]}</p>
+            <p class="text-gray-700">${n[8]}</p>
+            <p class="text-xs text-gray-500 mt-1">구조일 ${n[1]} · ${n[0]}</p>
+        </article>`).join('');
+    document.querySelectorAll('.notice-filter').forEach(b => {
+        const on = b.dataset.kind===kind;
+        b.classList.toggle('bg-rose-500', on);
+        b.classList.toggle('text-white', on);
+        b.classList.toggle('bg-white', !on);
+        b.classList.toggle('text-rose-700', !on);
+        b.setAttribute('aria-pressed', on);
     });
 }
 
