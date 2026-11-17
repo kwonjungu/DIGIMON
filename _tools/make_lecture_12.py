@@ -25,9 +25,15 @@ def go(url, label):
     return f'<div class="go"><span class="qr">{qr(url)}</span><a href="{url}" target="_blank" class="btn">{label} ↗</a></div>'
 
 
+CREW = [('img/mascot.webp', '멍이'), ('img/cat.webp', '냥이'), ('img/rabbit.webp', '토토'),
+        ('img/hamster.webp', '햄찌'), ('img/bird.webp', '짹짹'), ('img/fish.webp', '뻐끔')]
+TURN = [0]   # 말풍선마다 캐릭터를 차례로 바꾼다(한 장 안에서도 서로 다르게)
+
+
 def bub(t, step=None, r=False):
     st = f' data-step="{step}"' if step else ''
-    return f'<div class="bub{" r" if r else ""}"{st}><img class="face" src="{FACE}" alt=""><div class="talk"><b class="nm">디지몬</b>{t}</div></div>'
+    face, nm = CREW[TURN[0] % len(CREW)]; TURN[0] += 1
+    return f'<div class="bub{" r" if r else ""}"{st}><img class="face" src="{face}" alt=""><div class="talk"><b class="nm">{nm}</b>{t}</div></div>'
 
 
 def bubs(ts, start=1):
