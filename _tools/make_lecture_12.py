@@ -79,6 +79,11 @@ def open_(tag, title, img, todo, ts, link=None, note=''):
     return (head(tag, title) + f'<div class="two wide">{pic(img, "contain")}<div class="col"><p class="todo">{todo}</p>{g}{bubs(ts)}{memo(note)}</div></div>', AI)
 
 
+def think(tag, title, q, ts, note=''):
+    return (head(tag, title) + f'<div class="think">{pic("../assets/act1-data.webp", "contain")}<p class="q">{q}</p></div>'
+            f'<div class="bubrow three">{bubs(ts)}</div>{memo(note)}', AI)
+
+
 def cap(tag, title, img, ts, note='', link=None, src=WEB, wide=False):
     g = go(*link) if link else ''
     from PIL import Image
@@ -90,10 +95,11 @@ def cap(tag, title, img, ts, note='', link=None, src=WEB, wide=False):
             f'<div class="col">{bubs(ts)}{memo(note)}{g}</div></div>', src)
 
 
-def cap2(tag, title, a, b, la, lb, ts, src=WEB):
+def cap2(tag, title, a, b, la, lb, ts, src=WEB, link=None):
+    g = go(*link) if link else ''
     return (head(tag, title) + f'<div class="cap2"><figure class="shot"><img src="{a}" alt=""><figcaption>{e(la)}</figcaption></figure>'
             f'<figure class="shot"><img src="{b}" alt=""><figcaption>{e(lb)}</figcaption></figure></div>'
-            f'<div class="bubrow">{bubs(ts)}</div>', src)
+            f'<div class="bubrow">{bubs(ts)}{g}</div>', src)
 
 
 def predict(tag, title, q, opts, after, ts, note=''):
@@ -109,7 +115,7 @@ def flips(tag, title, cards, ts):
 
 
 def gallery(tag, title, ts):
-    figs = ''.join(f'<figure><img src="gallery/익명화{i}.webp" alt="익명화{i} 그래프"><figcaption>익명화{i}</figcaption></figure>' for i in range(1, 19))
+    figs = ''.join(f'<button class="gfig" type="button"><img src="gallery/익명화{i}.webp" alt="우리 반 그래프 {i}"></button>' for i in range(1, 19))
     return (head(tag, title) + f'<div class="gal">{figs}</div><div class="bubrow">{bubs(ts)}</div>',
             '예시 자료: 웹 활동지 「나도 어린이 통계청」으로 만든 학급 그래프 18장(수치는 예시)')
 
@@ -148,6 +154,10 @@ SLIDES = [
     ('cap', cap('1차시 활동1', '그래프에서 무엇이 보이나요?', 'shots/trend.webp',
                 ['두 선 가운데 어느 쪽이 더 높나요?', '가장 높이 올라간 때는 언제예요? 왜 그랬을지 <b>까닭을 짐작</b>해 봐요.'],
                 '위 그래프는 활동지에 담긴 자료로 전 세계 기준이에요. 트렌드 접속이 안 되면 이 그래프로 봐요.')),
+    ('think', think('1차시 활동1 생각해 보기', '강아지와 고양이, 공정한 비교일까?', '검색어 하나로<br>두 동물의 인기를 견주어도 될까요?',
+                    ['강아지를 찾을 때 <b>개</b>나 <b>반려견</b>이라고 검색하는 사람도 있지 않을까요?', '고양이를 부르는 다른 말도 있을까요? 낱말에 따라 결과가 달라질까요?',
+                     '<b>강아지</b>는 어린 개를 뜻하기도 해요. 다 큰 개를 찾는 사람은 어떤 낱말을 쓸까요?'],
+                    '떠오른 낱말을 구글 트렌드에 넣어 직접 비교해 봐요.')),
     ('cap', cap('1차시 활동1', '시기와 지역에 따른 발견 사실', 'shots/p1_4.webp',
                 ['시기에 따라, 지역에 따라 달라진 점을 찾아 적어요.', '<b>더 알고 싶은 질문</b>은 공책에 하나 적고 짝과 나눠요.'],
                 '발견 사실은 웹 활동지 활동1의 두 칸에 적고 사진 저장으로 공유해요.')),
@@ -161,9 +171,21 @@ SLIDES = [
                 ['별빛시 동물보호센터의 2022년부터 2025년까지 기록이에요.', '웹 활동지 ② 표에 개, 고양이, 그 외 숫자를 직접 입력해요.'],
                 '빈 정리표 CSV를 내려받아 써도 돼요.')),
     ('break', brk('1차시 끝! 잠깐 쉬어요', ['다음 시간에는 정리한 표를 엔트리로 그래프로 만들어요.'])),
-    ('cap', cap('2차시 활동2', '엔트리 데이터 분석으로 차트 그리기', 'shots/p2_4.webp',
-                ['작품 만들기 → 데이터분석 → 테이블 불러오기 순서로 들어가요.', '차트 탭에서 <b>막대</b>나 <b>꺾은선</b>을 골라요.'],
-                link=('https://playentry.org/', '엔트리 열기'))),
+    ('cap2', cap2('2차시 활동2', '엔트리에 들어가요', 'shots/en1_menu.webp', 'shots/en2_table.webp', '만들기에서 작품 만들기', '데이터분석에서 테이블 불러오기',
+                  ['엔트리 누리집 위쪽 <b>만들기</b>에 마우스를 올리고 <b>작품 만들기</b>를 눌러요.', '왼쪽 블록 꾸러미에서 <b>데이터분석</b>을 누르고 <b>테이블 불러오기</b>를 눌러요.'],
+                  src='화면: 엔트리(playentry.org) 작품 만들기', link=('https://playentry.org/', '엔트리 열기'))),
+    ('cap', cap('2차시 활동2', '새 표를 만들어요', 'shots/en34.webp',
+                ['창이 열리면 왼쪽 위 <b>테이블 추가하기</b>를 눌러요.', '<b>새로 만들기</b> 탭을 고르고 오른쪽 <b>테이블 새로 만들기</b>를 눌러요.'],
+                src='화면: 엔트리(playentry.org) 작품 만들기')),
+    ('cap', cap('2차시 활동2', '표에 숫자를 입력해요', 'shots/en5_type.webp',
+                ['첫 줄에는 연도, 개, 고양이, 그 외를 써요.', '아래 줄에는 활동지 ② 표에 정리한 숫자를 그대로 옮겨 적어요.'],
+                '칸을 두 번 누르면 글자를 쓸 수 있어요. 맨 위 칸에서 표 이름도 바꿔요.', src='화면: 엔트리(playentry.org) 작품 만들기')),
+    ('cap2', cap2('2차시 활동2', '차트를 골라요', 'shots/en6_bar.webp', 'shots/en7_axis.webp', '차트 탭에서 더하기, 막대', '가로축은 연도, 계열은 모두',
+                  ['<b>차트</b> 탭을 누르고 <b>+</b> 단추를 눌러 <b>막대</b>를 골라요.', '가로축은 <b>연도</b>, 계열은 <b>모두</b>에 표시해요. 선 그래프로도 바꿔 봐요.'],
+                  src='화면: 엔트리(playentry.org) 작품 만들기')),
+    ('cap', cap('2차시 활동2', '차트가 완성되었어요', 'shots/en8_done.webp',
+                ['다 되면 창 오른쪽 위의 <b>적용하기</b>를 눌러요.', '막대와 선 가운데 어느 쪽이 변화를 더 잘 보여 주나요?'],
+                src='화면: 엔트리(playentry.org) 작품 만들기, 숫자는 별빛시 가상 자료', wide=True)),
     ('cap', cap('2차시 활동2', '그래프에서 발견한 사실', 'shots/p2_5.webp',
                 ['내가 만든 그래프에서 개, 고양이 수가 어떻게 바뀌었나요?', '발견한 사실을 한두 문장으로 적어요.'],
                 '웹 활동지 활동2 「그래프에서 발견한 사실」 칸')),
@@ -186,7 +208,7 @@ SLIDES = [
                 '등록 대상 6종: 개, 고양이, 토끼, 페럿, 기니피그, 햄스터')),
     ('cap2', cap2('2차시 활동3', '나도 어린이 통계청', 'shots/p3_5_table.webp', 'shots/p3_5_graph.webp', '① 표 만들기', '③ 완성된 그래프',
                   ['조사 주제를 고르고 손을 든 친구 수를 +로 세요. 그래프 종류도 바꿔 봐요.', '다 만들면 <b>그래프 사진으로 저장</b>을 눌러요.'])),
-    ('gallery', gallery('2차시 더 해 보기', '우리 반 그래프 전시회', ['친구 그래프에서 가장 눈에 띄는 사실 하나를 찾아 말해 봐요.'])),
+    ('gallery', gallery('2차시 더 해 보기', '우리 반 그래프 전시회', ['그래프를 누르면 크게 볼 수 있어요. 가장 눈에 띄는 사실 하나를 찾아 말해 봐요.'])),
     ('cap', cap('2차시 활동3', '내가 가장 좋아하는 동물', 'shots/p3_6.webp',
                 ['다양한 반려동물 가운데 내가 가장 좋아하는 동물을 골라요.', '그 동물에 대해 가장 궁금한 점을 적어요.'],
                 '③에 동물과 고른 까닭을, 「다음 시간으로 이어가기」에 궁금한 점을 적어요.')),
@@ -208,21 +230,41 @@ EXTRA = '''
 .cap2 .shot img{flex:1;min-height:0;width:100%}.cap2 figcaption{flex:none;font-family:'Jua';font-size:24px;line-height:1.2;color:var(--grass-d)}
 .shotcol{justify-content:center}.shotcol .shot{max-height:470px}
 .gal{display:grid;grid-template-columns:repeat(6,1fr);grid-auto-rows:1fr;gap:10px;flex:1;min-height:0;margin-bottom:10px}
-.gal figure{position:relative;background:#fff;border:2px solid var(--line);border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.gal .gfig{position:relative;cursor:zoom-in;padding:0;background:#fff;border:2px solid var(--line);border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center}
 .gal img{max-width:100%;max-height:100%;object-fit:contain}
-.gal figcaption{position:absolute;left:6px;top:6px;font-family:'Jua';font-size:14px;background:var(--ink);color:#fff;border-radius:8px;padding:1px 8px}
+.glight{position:fixed;inset:0;background:#000c;z-index:99;display:flex;align-items:center;justify-content:center;gap:2vw;cursor:zoom-out}
+.glight img{max-width:80vw;max-height:88vh;background:#fff;border-radius:16px;box-shadow:0 10px 40px #0008}
+.glight .gn{font-family:'Jua';font-size:6vh;color:#fff;background:#fff3;border:0;border-radius:50%;width:9vh;height:9vh;cursor:pointer}
+.glight .gc{position:absolute;bottom:3vh;color:#fff;font-family:'Jua';font-size:3vh}
 .flip .fr{padding:18px}.flip .fr b{font-size:28px;line-height:1.35}.flip .bk b{font-size:56px;font-family:'Jua'}
 .wrapq{list-style:none;counter-reset:w;display:flex;flex-direction:column;gap:16px;justify-content:center;flex:1}
 .wrapq li{counter-increment:w;background:#fff;border-radius:18px;padding:16px 20px 16px 70px;font-size:27px;position:relative;box-shadow:0 3px 10px #0001}
 .wrapq li::before{content:counter(w);position:absolute;left:16px;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;background:var(--grass);color:#fff;font-family:'Jua';font-size:24px;display:flex;align-items:center;justify-content:center}
 .go .qr svg{width:110px;height:110px}
 .t-flip .bubrow{display:flex!important;margin-top:24px}.t-flip .flips{flex:none}
+.think{display:flex;align-items:center;gap:40px;flex:1;min-height:0}.think .pic{width:300px;height:220px;flex:none}.think .q{font-size:40px;line-height:1.4}
+.bubrow.three{display:flex;gap:14px;margin:8px 0 12px}.bubrow.three .bub{flex:1}.bubrow.three .talk{font-size:22px}
 .capt{display:flex;flex-direction:column;gap:12px;flex:1;min-height:0}
 .capt .shot{background:#fff;border:3px solid var(--line);border-radius:20px;box-shadow:0 6px 18px #0002;padding:8px;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .capt .shot img{max-width:100%;max-height:100%;object-fit:contain}
 .capt .bubrow{display:flex;gap:16px}.capt .bubrow .bub{flex:1}
 .capfoot{display:flex;gap:16px;align-items:center}.capfoot .memo{flex:1}.capfoot .go .qr svg{width:80px;height:80px}
 '''
+
+
+LIGHT = '''(function(){
+  var figs=[].slice.call(document.querySelectorAll('.gfig')), box=null, k=0;
+  function show(i){ k=(i+figs.length)%figs.length; box.querySelector('img').src=figs[k].querySelector('img').src; box.querySelector('.gc').textContent=(k+1)+' / '+figs.length; }
+  function close(){ if(box){ box.remove(); box=null; } }
+  figs.forEach(function(f,i){ f.addEventListener('click',function(ev){ ev.stopPropagation(); close();
+    box=document.createElement('div'); box.className='glight';
+    box.innerHTML='<button class="gn" type="button" aria-label="앞 그래프">‹</button><img alt=""><button class="gn" type="button" aria-label="다음 그래프">›</button><span class="gc"></span>';
+    var b=box.querySelectorAll('.gn'); b[0].onclick=function(e){e.stopPropagation();show(k-1);}; b[1].onclick=function(e){e.stopPropagation();show(k+1);};
+    box.onclick=function(e){e.stopPropagation();close();}; document.body.appendChild(box); show(i); }); });
+  document.addEventListener('keydown',function(ev){ if(!box) return;
+    if(ev.key==='ArrowRight'){show(k+1);} else if(ev.key==='ArrowLeft'){show(k-1);} else if(ev.key==='Escape'||ev.key===' '){close();} else return;
+    ev.preventDefault(); ev.stopImmediatePropagation(); }, true);
+})();'''
 
 
 def build():
@@ -237,7 +279,7 @@ def build():
            '<title>1~2차시 수업 교안 · 데이터로 만나는 반려동물 사회 · DIGIMON</title>'
            f'<link rel="icon" href="{FACE}"><style>{css}</style></head><body><main class="deck">{"".join(parts)}</main>'
            '<nav class="ctl"><a href="../">← 활동지</a><button id="prev" title="앞 장">←</button><span id="pg"></span><button id="nextb" title="다음">→</button>'
-           f'<button id="fs" title="전체 화면 (F)">⛶ 전체 화면</button><a href="{PDF}" download>PDF</a></nav><script>{js}</script></body></html>')
+           f'<button id="fs" title="전체 화면 (F)">⛶ 전체 화면</button><a href="{PDF}" download>PDF</a></nav><script>{js}</script><script>{LIGHT}</script></body></html>')
     open(os.path.join(OUT, 'index.html'), 'w', encoding='utf-8').write(doc)
     subprocess.run(['node', os.path.join(EDU, 'lecture_pdf.cjs'), os.path.join(OUT, 'index.html'), os.path.join(OUT, PDF)], check=True)
     print(N, '장 →', OUT)
