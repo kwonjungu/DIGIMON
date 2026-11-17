@@ -84,13 +84,13 @@ def think(tag, title, q, ts, note=''):
             f'<div class="bubrow three">{bubs(ts)}</div>{memo(note)}', AI)
 
 
-def cap(tag, title, img, ts, note='', link=None, src=WEB, wide=False):
+def cap(tag, title, img, ts, note='', link=None, src=WEB, wide=False, side=False):
     g = go(*link) if link else ''
     if img.startswith('<'):
         return (head(tag, title) + f'<div class="cap">{img}<div class="col">{bubs(ts)}{memo(note)}{g}</div></div>', src)
     from PIL import Image
     w, h = Image.open(os.path.join(OUT, img)).size
-    if w / h > 1.8:   # 가로로 긴 캡처: 위에 크게, 말풍선은 아래 줄
+    if w / h > 1.8 and not side:   # 가로로 긴 캡처: 위에 크게, 말풍선은 아래 줄
         return (head(tag, title) + f'<div class="capt"><div class="shot"><img src="{img}" alt=""></div>'
                 f'<div class="bubrow">{bubs(ts)}</div><div class="capfoot">{memo(note)}{g}</div></div>', src)
     return (head(tag, title) + f'<div class="cap{" wide" if wide else ""}"><div class="shot"><img src="{img}" alt=""></div>'
@@ -168,7 +168,7 @@ SLIDES = [
                     '칠판 표 칸: 강아지, 고양이, 물고기, 햄스터, 그 밖의 동물, 안 키워요')),
     ('cap', cap('1차시 도입', '강아지 vs 고양이, 누가 더 인기일까?', 'shots/p1_2.webp',
                 ['내 생각을 먼저 고르고, 그렇게 생각한 이유를 말해 봐요.', '우리 반 결과가 <b>우리나라 전체</b>와 같을까요?'],
-                '웹 활동지 활동1 ①에 내 생각과 이유를 적어요.')),
+                '웹 활동지 활동1 ①에 내 생각과 이유를 적어요.', side=True, wide=True)),
     ('mission', mission('다양한 데이터를 활용해 반려동물 현황을 조사하여, 우리 사회의 반려동물 문제를 설명할 수 있다.',
                         ['오늘은 데이터 조사관이 되어 세 가지 데이터를 살펴봐요.'])),
     ('open', open_('1차시 활동1', '데이터 조사관이 되었어요', '../assets/act1-data.webp',
