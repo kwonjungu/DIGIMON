@@ -62,7 +62,7 @@ def cover():
 
 def path(items, ts):
     cells = ''.join(f'<li class="{"cha" if b == "" else ""}"><b>{e(a)}</b><span>{e(b)}</span></li>' for a, b in items)
-    return (head('', '오늘의 길') + f'<ol class="path">{cells}</ol><div class="pathrow">{pic("../assets/act3-pets.webp", "contain")}{bubs(ts)}</div>', AI)
+    return (head('', '오늘의 길') + f'<ol class="path">{cells}</ol><div class="pathrow">{pic("../assets/act3-pets.webp", "contain")}<div class="col">{bubs(ts)}{go(SITE, "웹 활동지 열기")}</div></div>', AI)
 
 
 def scene(tag, title, img, ts, note='', src=AI):
@@ -86,6 +86,8 @@ def think(tag, title, q, ts, note=''):
 
 def cap(tag, title, img, ts, note='', link=None, src=WEB, wide=False):
     g = go(*link) if link else ''
+    if img.startswith('<'):
+        return (head(tag, title) + f'<div class="cap">{img}<div class="col">{bubs(ts)}{memo(note)}{g}</div></div>', src)
     from PIL import Image
     w, h = Image.open(os.path.join(OUT, img)).size
     if w / h > 1.8:   # 가로로 긴 캡처: 위에 크게, 말풍선은 아래 줄
@@ -95,8 +97,11 @@ def cap(tag, title, img, ts, note='', link=None, src=WEB, wide=False):
             f'<div class="col">{bubs(ts)}{memo(note)}{g}</div></div>', src)
 
 
-def cap2(tag, title, a, b, la, lb, ts, src=WEB, link=None):
+def cap2(tag, title, a, b, la, lb, ts, src=WEB, link=None, tall=False):
     g = go(*link) if link else ''
+    if tall:   # 세로로 긴 캡처 두 장: 크게 나란히, 말풍선은 오른쪽
+        return (head(tag, title) + f'<div class="cap2t"><figure class="shot"><img src="{a}" alt=""><figcaption>{e(la)}</figcaption></figure>'
+                f'<figure class="shot"><img src="{b}" alt=""><figcaption>{e(lb)}</figcaption></figure><div class="col">{bubs(ts)}{g}</div></div>', src)
     return (head(tag, title) + f'<div class="cap2"><figure class="shot"><img src="{a}" alt=""><figcaption>{e(la)}</figcaption></figure>'
             + (f'<figure class="shot">{b}<figcaption>{e(lb)}</figcaption></figure></div>' if b.startswith('<') else f'<figure class="shot"><img src="{b}" alt=""><figcaption>{e(lb)}</figcaption></figure></div>') +
             f'<div class="bubrow">{bubs(ts)}{g}</div>', src)
@@ -113,6 +118,10 @@ def bars(title, rows, unit, src):   # 교실 뒤에서도 읽히는 큰 글씨 �
 KOSIS = bars('우리나라 반려가구가 키우는 동물(2025)', [('개', 80.5), ('고양이', 14.4), ('어류', 4.1), ('햄스터, 토끼 등', 1.0), ('앵무새 등 새', 0.7), ('도마뱀, 거북 등', 0.5)], '%',
              '양육 가구 867곳, 여러 개 고르기')
 KOSIS_S = bars('', [('개', 80.5), ('고양이', 14.4), ('어류', 4.1), ('햄스터, 토끼 등', 1.0), ('앵무새 등 새', 0.7), ('도마뱀, 거북 등', 0.5)], '%', '')
+
+
+YEARS = '<div class="years">' + ''.join(f'<div><b>{y}년 기록</b><p>개 <em>{a}</em>마리<br>고양이 <em>{c}</em>마리<br>그 외 <em>{o}</em>마리</p></div>'
+          for y, a, c, o in [(2022, 412, 146, 9), (2023, 398, 153, 11), (2024, 371, 161, 8), (2025, 336, 172, 12)]) + '</div>'
 
 
 def predict(tag, title, q, opts, after, ts, note=''):
@@ -165,7 +174,7 @@ SLIDES = [
     ('open', open_('1차시 활동1', '데이터 조사관이 되었어요', '../assets/act1-data.webp',
                    '구글 트렌드에서 기간은 <b>최근 5년</b>, 지역은 <b>대한민국</b>으로 정하고 \'강아지\'와 \'고양이\' 검색량을 비교해요.',
                    ['검색량은 무엇을 알려 주는 숫자일까요? 먼저 생각해 봐요.'], (T1, '구글 트렌드 열기'))),
-    ('cap', cap('1차시 활동1', '그래프에서 무엇이 보이나요?', 'shots/trend.webp',
+    ('cap', cap('1차시 활동1', '그래프에서 무엇이 보이나요?', 'shots/trend_lb.webp',
                 ['두 선 가운데 어느 쪽이 더 높나요?', '가장 높이 올라간 때는 언제예요? 왜 그랬을지 <b>까닭을 짐작</b>해 봐요.'],
                 '왼쪽 그래프는 활동지에 담긴 자료로 전 세계 기준이에요. 트렌드 접속이 안 되면 이 그래프로 봐요.')),
     ('think', think('1차시 활동1 생각해 보기', '강아지와 고양이, 공정한 비교일까?', '검색어 하나로<br>두 동물의 인기를 견주어도 될까요?',
@@ -181,7 +190,7 @@ SLIDES = [
     ('cap', cap('1차시 활동2', '별빛시 2026년 가을 공고 살펴보기', 'shots/p2_notice.webp',
                 ['동물들은 어디에서 발견되었나요? 지금은 어떻게 지내고 있나요?', '보호 중, 입양됨, 주인에게 돌아감… 동물의 입장에서 살펴봐요.'],
                 '개, 고양이, 그 외 단추로 종류별 공고를 모아 볼 수 있어요.')),
-    ('cap', cap('1차시 활동2', '연간 기록을 보고 표에 직접 입력해요', 'shots/p2_year.webp',
+    ('cap', cap('1차시 활동2', '연간 기록을 보고 표에 직접 입력해요', YEARS,
                 ['별빛시 동물보호센터의 2022년부터 2025년까지 기록이에요.', '웹 활동지 ② 표에 개, 고양이, 그 외 숫자를 직접 입력해요.'],
                 '빈 정리표 CSV를 내려받아 써도 돼요.')),
     ('break', brk('1차시 끝! 잠깐 쉬어요', ['다음 시간에는 정리한 표를 엔트리로 그래프로 만들어요.'])),
@@ -197,7 +206,7 @@ SLIDES = [
     ('cap', cap('2차시 활동2', '표에 숫자를 입력해요', 'shots/en5_type.webp',
                 ['첫 줄에는 연도, 개, 고양이, 그 외를 써요.', '아래 줄에는 활동지 ② 표에 정리한 숫자를 그대로 옮겨 적어요.'],
                 '칸을 두 번 누르면 글자를 쓸 수 있어요. 맨 위 칸에서 표 이름도 바꿔요.', src='화면: 엔트리(playentry.org) 작품 만들기')),
-    ('cap2', cap2('2차시 활동2', '차트를 골라요', 'shots/en6_bar.webp', 'shots/en7_axis.webp', '차트 탭에서 더하기, 막대', '가로축은 연도, 계열은 모두',
+    ('cap2', cap2('2차시 활동2', '차트를 골라요', 'shots/en6_bar.webp', 'shots/en7_axis.webp', '차트 탭의 + 단추를 눌러 막대 고르기', '가로축에 연도, 계열에 모두 표시',
                   ['<b>차트</b> 탭을 누르고 <b>+</b> 단추를 눌러 <b>막대</b>를 골라요.', '가로축은 <b>연도</b>, 계열은 <b>모두</b>에 표시해요. 선 그래프로도 바꿔 봐요.'],
                   src='화면: 엔트리(playentry.org) 작품 만들기')),
     ('cap', cap('2차시 활동2', '차트가 완성되었어요', 'shots/en8_done.webp',
@@ -214,7 +223,7 @@ SLIDES = [
                    ['이 조사는 누구에게 무엇을 물어서 모은 데이터일까요? 제목을 먼저 읽어 봐요.'])),
     ('predict', predict('2차시 활동3', '먼저 예측해요', '우리나라 반려가구가<br>가장 많이 키우는 동물은?', ['개', '고양이', '어류(물고기)', '햄스터'],
                         KOSIS, ['내 예측을 고른 뒤 그래프를 확인해요.'])),
-    ('cap2', cap2('2차시 활동3', '두 데이터의 1등이 같나요?', 'shots/trend.webp', KOSIS_S, '그래프 가', '그래프 나',
+    ('cap2', cap2('2차시 활동3', '두 데이터의 1등이 같나요?', 'shots/trend_lb.webp', KOSIS_S, '그래프 가', '그래프 나',
                   ['두 그래프는 각각 <b>무엇을 잰 데이터</b>일까요?', '왜 결과가 다를지 짝과 이유를 찾아봐요.'])),
     ('flip', flips('2차시 활동3', '숫자 카드 뒤집기', [('우리나라 가구 중 반려동물을 키우는 비율은?', '<b>29.2%</b>'),
                                                     ('어류를 키우는 집은 평균 몇 마리?', '<b>13.1마리</b>'),
@@ -223,12 +232,12 @@ SLIDES = [
     ('cap', cap('2차시 활동3', '우리 곁의 다양해진 반려동물', 'shots/p3_4.webp',
                 ['관심 가는 동물을 모두 골라요.', '동물보호법은 어떤 동물을 반려동물로 정해 두었을까요?'],
                 '활동지 ② 아래 ※ 글에서 답을 찾아봐요.')),
-    ('cap2', cap2('2차시 더 해 보기', '나도 어린이 통계청', 'shots/p3_5_table.webp', 'shots/p3_5_graph.webp', '① 표 만들기', '③ 완성된 그래프',
-                  ['조사 주제를 고르고 손을 든 친구 수를 +로 세요. 그래프 종류도 바꿔 봐요.', '다 만들면 <b>그래프 사진으로 저장</b>을 눌러요.'])),
-    ('gallery', gallery('2차시 더 해 보기', '우리 반 그래프 전시회(예시)', ['예시로 만든 그래프예요. 누르면 크게 볼 수 있어요. 가장 눈에 띄는 사실 하나를 찾아 말해 봐요.'])),
     ('cap', cap('2차시 활동3', '내가 가장 좋아하는 동물', 'shots/p3_6.webp',
                 ['다양한 반려동물 가운데 내가 가장 좋아하는 동물을 골라요.', '그 동물에 대해 가장 궁금한 점을 적어요.'],
                 '③에 동물과 고른 까닭을, 「다음 시간으로 이어가기」에 궁금한 점을 적어요.')),
+    ('cap2', cap2('2차시 더 해 보기', '나도 어린이 통계청', 'shots/p3_5_table.webp', 'shots/p3_5_graph.webp', '① 표 만들기', '③ 완성된 그래프',
+                  ['조사 주제를 고르고 손을 든 친구 수를 +로 세요. 그래프 종류도 바꿔 봐요.', '다 만들면 <b>그래프 사진으로 저장</b>을 눌러요.'], tall=True)),
+    ('gallery', gallery('2차시 더 해 보기', '우리 반 그래프 전시회(예시)', ['예시로 만든 그래프예요. 누르면 크게 볼 수 있어요. 가장 눈에 띄는 사실 하나를 찾아 말해 봐요.'])),
     ('wrap', wrap('2차시 정리', '오늘 찾은 것 정리', ['세 가지 데이터가 알려 준 것을 한 줄씩 말해요.',
                                                   '우리 사회의 반려동물 문제를 한 문장으로 정리해요.',
                                                   '책임감 있는 반려 문화를 위해 우리가 할 수 있는 일은?'])),
@@ -268,6 +277,12 @@ EXTRA = '''
 .hbars em{font-style:normal;font-family:'Jua';font-size:24px}.hbars .hs{font-size:16px;color:var(--sub);margin-top:8px}
 .cap2 .shot .hbars{border:0;box-shadow:none;padding:6px 10px;flex:1;display:flex;align-items:center}.cap2 .shot .hbars ul{width:100%}.cap2 .shot .hbars li{grid-template-columns:150px 1fr 80px;font-size:20px}.cap2 .shot .hbars .bar{height:24px}
 .path{display:grid!important;grid-template-columns:repeat(4,1fr);gap:10px}.path li.cha{display:flex;align-items:center;justify-content:center}.path li.cha b{font-size:32px}.path li.cha span{display:none}
+.years{flex:1.25;display:grid;grid-template-columns:1fr 1fr;gap:14px;align-content:center}
+.years div{background:#fff;border:3px solid #f3c9cc;border-radius:18px;padding:14px 20px;box-shadow:0 4px 12px #0001}
+.years b{font-family:'Jua';font-weight:400;font-size:30px;color:#a3343c}.years p{font-size:27px;line-height:1.45;margin-top:4px}.years em{font-style:normal;font-family:'Jua';font-size:34px}
+.cap2t{display:flex;gap:18px;flex:1;min-height:0}.cap2t .shot{flex:none;max-width:34%;display:flex;flex-direction:column;align-items:center;height:100%;margin:0}
+.cap2t .shot img{flex:1;min-height:0;width:auto;max-width:100%;object-fit:contain}.cap2t figcaption{font-family:'Jua';font-size:24px;color:var(--grass-d)}.cap2t .col{flex:1}
+.pathrow .col{display:flex;flex-direction:column;gap:12px;justify-content:center}
 .capt{display:flex;flex-direction:column;gap:12px;flex:1;min-height:0}
 .capt .shot{background:#fff;border:3px solid var(--line);border-radius:20px;box-shadow:0 6px 18px #0002;padding:8px;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .capt .shot img{max-width:100%;max-height:100%;object-fit:contain}
