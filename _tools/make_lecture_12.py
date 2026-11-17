@@ -98,14 +98,28 @@ def cap(tag, title, img, ts, note='', link=None, src=WEB, wide=False):
 def cap2(tag, title, a, b, la, lb, ts, src=WEB, link=None):
     g = go(*link) if link else ''
     return (head(tag, title) + f'<div class="cap2"><figure class="shot"><img src="{a}" alt=""><figcaption>{e(la)}</figcaption></figure>'
-            f'<figure class="shot"><img src="{b}" alt=""><figcaption>{e(lb)}</figcaption></figure></div>'
+            + (f'<figure class="shot">{b}<figcaption>{e(lb)}</figcaption></figure></div>' if b.startswith('<') else f'<figure class="shot"><img src="{b}" alt=""><figcaption>{e(lb)}</figcaption></figure></div>') +
             f'<div class="bubrow">{bubs(ts)}{g}</div>', src)
+
+
+def bars(title, rows, unit, src):   # 교실 뒤에서도 읽히는 큰 글씨 가로 막대(그림이 아닌 HTML)
+    mx = max(v for _, v in rows)
+    li = ''.join(f'<li><b>{e(n)}</b><span class="bar"><i style="width:{max(v / mx * 100, 0.8):.1f}%"></i></span><em>{v:g}{unit}</em></li>' for n, v in rows)
+    t = f'<p class="ht">{e(title)}</p>' if title else ''
+    sr = f'<p class="hs">{e(src)}</p>' if src else ''
+    return f'<div class="hbars">{t}<ul>{li}</ul>{sr}</div>'
+
+
+KOSIS = bars('우리나라 반려가구가 키우는 동물(2025)', [('개', 80.5), ('고양이', 14.4), ('어류', 4.1), ('햄스터, 토끼 등', 1.0), ('앵무새 등 새', 0.7), ('도마뱀, 거북 등', 0.5)], '%',
+             '양육 가구 867곳, 여러 개 고르기')
+KOSIS_S = bars('', [('개', 80.5), ('고양이', 14.4), ('어류', 4.1), ('햄스터, 토끼 등', 1.0), ('앵무새 등 새', 0.7), ('도마뱀, 거북 등', 0.5)], '%', '')
 
 
 def predict(tag, title, q, opts, after, ts, note=''):
     o = ''.join(f'<button class="opt">{e(x)}</button>' for x in opts)
     return (head(tag, title) + f'<div class="two wide"><div class="col"><p class="q">{q}</p><div class="opts">{o}</div>{bubs(ts)}</div>'
-            f'<div class="col shotcol" data-step="{len(ts) + 1}"><div class="shot"><img src="{after}" alt=""></div>{memo(note)}</div></div>', WEB)
+            f'<div class="col shotcol" data-step="{len(ts) + 1}">{after if after.startswith("<") else f"<div class=shot><img src={after} alt=></div>"}{memo(note)}</div></div>',
+            '출처: 농림축산식품부와 검역본부 「2025년 반려동물 양육현황 조사」')
 
 
 def flips(tag, title, cards, ts):
@@ -199,8 +213,8 @@ SLIDES = [
                    '2025년 반려동물 양육현황 조사(국가승인통계)로 우리나라 가정이 실제로 키우는 동물을 살펴봐요.',
                    ['이 조사는 누구에게 무엇을 물어서 모은 데이터일까요? 제목을 먼저 읽어 봐요.'])),
     ('predict', predict('2차시 활동3', '먼저 예측해요', '우리나라 반려가구가<br>가장 많이 키우는 동물은?', ['개', '고양이', '물고기', '햄스터'],
-                        'shots/species.webp', ['내 예측을 고른 뒤 그래프를 확인해요.'])),
-    ('cap2', cap2('2차시 활동3', '두 데이터의 1등이 같나요?', 'shots/trend.webp', 'shots/species.webp', '그래프 가', '그래프 나',
+                        KOSIS, ['내 예측을 고른 뒤 그래프를 확인해요.'])),
+    ('cap2', cap2('2차시 활동3', '두 데이터의 1등이 같나요?', 'shots/trend.webp', KOSIS_S, '그래프 가', '그래프 나',
                   ['두 그래프는 각각 <b>무엇을 잰 데이터</b>일까요?', '왜 결과가 다를지 짝과 이유를 찾아봐요.'])),
     ('flip', flips('2차시 활동3', '숫자 카드 뒤집기', [('우리나라 가구 중 반려동물을 키우는 비율은?', '<b>29.2%</b>'),
                                                     ('어류를 키우는 집은 평균 몇 마리?', '<b>13.1마리</b>'),
@@ -247,6 +261,13 @@ EXTRA = '''
 .t-flip .bubrow{display:flex!important;margin-top:24px}.t-flip .flips{flex:none}
 .think{display:flex;align-items:center;gap:40px;flex:1;min-height:0}.think .pic{width:300px;height:220px;flex:none}.think .q{font-size:40px;line-height:1.4}
 .bubrow.three{display:flex;gap:14px;margin:8px 0 12px}.bubrow.three .bub{flex:1}.bubrow.three .talk{font-size:22px}
+.hbars{background:#fff;border:3px solid var(--line);border-radius:20px;box-shadow:0 6px 18px #0002;padding:18px 24px;width:100%}
+.hbars .ht{font-family:'Jua';font-size:26px;margin-bottom:10px}.hbars ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+.hbars li{display:grid;grid-template-columns:170px 1fr 92px;align-items:center;gap:10px;font-size:23px}.hbars li b{font-weight:400;text-align:right}
+.hbars .bar{height:30px;background:#f1eee7;border-radius:8px;overflow:hidden}.hbars .bar i{display:block;height:100%;background:var(--grass);border-radius:8px}
+.hbars em{font-style:normal;font-family:'Jua';font-size:24px}.hbars .hs{font-size:16px;color:var(--sub);margin-top:8px}
+.cap2 .shot .hbars{border:0;box-shadow:none;padding:6px 10px;flex:1;display:flex;align-items:center}.cap2 .shot .hbars ul{width:100%}.cap2 .shot .hbars li{grid-template-columns:150px 1fr 80px;font-size:20px}.cap2 .shot .hbars .bar{height:24px}
+.path{display:grid!important;grid-template-columns:repeat(4,1fr);gap:10px}.path li.cha{display:flex;align-items:center;justify-content:center}.path li.cha b{font-size:32px}.path li.cha span{display:none}
 .capt{display:flex;flex-direction:column;gap:12px;flex:1;min-height:0}
 .capt .shot{background:#fff;border:3px solid var(--line);border-radius:20px;box-shadow:0 6px 18px #0002;padding:8px;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .capt .shot img{max-width:100%;max-height:100%;object-fit:contain}
